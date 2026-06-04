@@ -175,17 +175,9 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
           <ImageUpload
             label="Product Image *"
             value={form.image}
-            onChange={(url) => { update('image', url); }}
+            onChange={(url) => update('image', url)}
           />
           {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
-          <p className="text-xs text-gray-400 mt-2">Upload from your PC, or paste a URL in the field below.</p>
-          <input
-            type="url"
-            value={form.image.startsWith('data:') ? '' : form.image}
-            onChange={(e) => update('image', e.target.value)}
-            placeholder="Or paste image URL: https://..."
-            className="mt-2 w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal-400"
-          />
         </div>
 
         {/* Stock */}

@@ -245,16 +245,9 @@ export default function PackageForm({ initial = {}, onSave, backHref, title, sav
         </div>
 
         {/* Image */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
+        <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <ImageUpload label="Package Image *" value={form.image} onChange={(url) => update('image', url)} />
-          {errors.image && <p className="text-red-500 text-xs">{errors.image}</p>}
-          <input
-            type="url"
-            value={form.image.startsWith('data:') ? '' : form.image}
-            onChange={(e) => update('image', e.target.value)}
-            placeholder="Or paste image URL: https://..."
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal-400"
-          />
+          {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
         </div>
 
         {/* Actions */}

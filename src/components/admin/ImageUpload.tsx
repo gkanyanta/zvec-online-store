@@ -65,27 +65,30 @@ export default function ImageUpload({ value, onChange, label = 'Product Image' }
       <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
 
       {value ? (
-        <div className="relative inline-block">
+        <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={value}
             alt="Preview"
-            className="w-40 h-40 object-cover rounded-xl border border-gray-200"
+            className="w-36 h-36 object-cover rounded-xl border border-gray-200 shrink-0"
           />
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow transition-colors"
-          >
-            <X size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="mt-2 block text-xs text-teal-600 hover:text-teal-700 font-medium"
-          >
-            Change image
-          </button>
+          <div className="flex flex-col gap-2 pt-1">
+            <p className="text-xs text-gray-500 font-medium">Image selected ✓</p>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="flex items-center gap-1.5 bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-700 text-xs font-semibold px-3 py-2 rounded-lg transition-colors"
+            >
+              <Upload size={13} /> Browse new image
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              className="flex items-center gap-1.5 text-red-500 hover:text-red-600 text-xs font-medium px-1"
+            >
+              <X size={13} /> Remove image
+            </button>
+          </div>
         </div>
       ) : (
         <div
@@ -95,7 +98,7 @@ export default function ImageUpload({ value, onChange, label = 'Product Image' }
           className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-200 hover:border-teal-400 rounded-xl p-8 cursor-pointer transition-colors bg-gray-50 hover:bg-teal-50"
         >
           {loading ? (
-            <><Loader2 size={28} className="text-green-500 animate-spin" /><p className="text-sm text-gray-500">Processing image…</p></>
+            <><Loader2 size={28} className="text-teal-500 animate-spin" /><p className="text-sm text-gray-500">Processing image…</p></>
           ) : (
             <>
               <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
