@@ -18,6 +18,7 @@ export default function Header() {
     { href: '/products?category=televisions', label: 'TVs' },
     { href: '/products?category=refrigerators', label: 'Fridges' },
     { href: '/products?category=mobile', label: 'Phones' },
+    { href: '/track-order', label: 'Track Order' },
   ];
 
   return (

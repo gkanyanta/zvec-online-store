@@ -53,6 +53,14 @@ function OrderConfirmedContent() {
           </ol>
         </div>
 
+        {/* Track order CTA */}
+        <Link
+          href={`/track-order?id=${orderId}`}
+          className="flex items-center justify-center gap-2 w-full bg-[#1e3a8a] hover:bg-[#1a3278] text-white font-bold py-3 rounded-xl transition-colors mb-3 text-sm"
+        >
+          <Package size={16} /> Track This Order
+        </Link>
+
         {/* Contact options */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           <a
