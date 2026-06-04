@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Search, Plus, ToggleLeft, ToggleRight, Trash2, Edit2 } from 'lucide-react';
 import { useInventoryStore } from '@/store/inventory';
 import { categories } from '@/lib/data';
@@ -102,7 +101,8 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-50 shrink-0">
-                          <Image src={product.image} alt={product.name} fill className="object-cover" sizes="48px" />
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-gray-900 line-clamp-2">{product.name}</p>
