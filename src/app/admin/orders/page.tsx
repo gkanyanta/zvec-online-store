@@ -68,7 +68,7 @@ function OrdersContent() {
             onClick={() => setStatusFilter(tab.value)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
               statusFilter === tab.value
-                ? 'bg-green-600 text-white'
+                ? 'bg-teal-500 text-white'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
           >
@@ -90,7 +90,7 @@ function OrdersContent() {
           placeholder="Search by order ID, name, phone, city..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-green-400 text-sm"
+          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-teal-400 text-sm"
         />
       </div>
 
@@ -119,7 +119,7 @@ function OrdersContent() {
                 {filtered.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
-                      <Link href={`/admin/orders/${order.id}`} className="font-mono text-sm font-bold text-green-700 hover:underline">
+                      <Link href={`/admin/orders/${order.id}`} className="font-mono text-sm font-bold text-teal-700 hover:underline">
                         {order.id}
                       </Link>
                     </td>
@@ -143,7 +143,7 @@ function OrdersContent() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Link href={`/admin/orders/${order.id}`} className="text-green-600 hover:text-green-700 p-1">
+                        <Link href={`/admin/orders/${order.id}`} className="text-teal-600 hover:text-teal-700 p-1">
                           <ChevronRight size={16} />
                         </Link>
                         <button

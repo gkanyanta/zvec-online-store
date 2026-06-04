@@ -86,7 +86,7 @@ export default function CustomersPage() {
         {[
           { label: 'Total Customers', value: customers.length, color: 'bg-purple-50 text-purple-700' },
           { label: 'Repeat Customers', value: customers.filter((c) => c.orderCount > 1).length, color: 'bg-blue-50 text-blue-700' },
-          { label: 'Avg. Order Value', value: formatPrice(orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0), color: 'bg-green-50 text-green-700' },
+          { label: 'Avg. Order Value', value: formatPrice(orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0), color: 'bg-teal-50 text-teal-700' },
           { label: 'Total Orders', value: orders.length, color: 'bg-orange-50 text-orange-700' },
         ].map((s) => (
           <div key={s.label} className={`rounded-2xl p-4 ${s.color.split(' ')[0]}`}>
@@ -104,7 +104,7 @@ export default function CustomersPage() {
           placeholder="Search by name, phone, or city..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-green-400 text-sm"
+          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-teal-400 text-sm"
         />
       </div>
 
@@ -133,7 +133,7 @@ export default function CustomersPage() {
                   <tr key={customer.phone} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                        <div className="w-9 h-9 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
                           {customer.firstName[0]}{customer.lastName[0]}
                         </div>
                         <div>
@@ -160,11 +160,11 @@ export default function CustomersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-bold text-green-700 text-sm">{formatPrice(customer.totalSpent)}</span>
+                      <span className="font-bold text-teal-700 text-sm">{formatPrice(customer.totalSpent)}</span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       <div>
-                        <Link href={`/admin/orders/${customer.lastOrderId}`} className="font-mono text-xs text-green-600 hover:underline">
+                        <Link href={`/admin/orders/${customer.lastOrderId}`} className="font-mono text-xs text-teal-600 hover:underline">
                           {customer.lastOrderId}
                         </Link>
                         <div className="mt-0.5">
@@ -177,7 +177,7 @@ export default function CustomersPage() {
                         href={`https://wa.me/${customer.phone.replace(/\D/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-green-600 hover:text-green-700 text-xs font-medium"
+                        className="flex items-center gap-1 text-teal-600 hover:text-teal-700 text-xs font-medium"
                       >
                         <MessageCircle size={14} /> WhatsApp
                       </a>

@@ -52,7 +52,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         {order.status !== 'cancelled' && order.status !== 'delivered' && nextStatus && (
           <button
             onClick={() => updateStatus(order.id, nextStatus)}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl transition-colors text-sm"
+            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl transition-colors text-sm"
           >
             <Check size={16} />
             Mark as {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
@@ -64,7 +64,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       {order.status !== 'cancelled' && (
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Clock size={16} className="text-green-600" /> Order Progress
+            <Clock size={16} className="text-teal-600" /> Order Progress
           </h2>
           <div className="flex items-center">
             {STATUS_STEPS.map((step, idx) => {
@@ -74,16 +74,16 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <div key={step} className="flex items-center flex-1">
                   <div className="flex flex-col items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                      done ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-400'
-                    } ${active ? 'ring-4 ring-green-100' : ''}`}>
+                      done ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400'
+                    } ${active ? 'ring-4 ring-teal-100' : ''}`}>
                       {done ? <Check size={14} /> : idx + 1}
                     </div>
-                    <span className={`text-xs mt-1 text-center capitalize font-medium ${done ? 'text-green-700' : 'text-gray-400'}`}>
+                    <span className={`text-xs mt-1 text-center capitalize font-medium ${done ? 'text-teal-700' : 'text-gray-400'}`}>
                       {step}
                     </span>
                   </div>
                   {idx < STATUS_STEPS.length - 1 && (
-                    <div className={`flex-1 h-0.5 mx-1 ${idx < currentStepIdx ? 'bg-green-500' : 'bg-gray-100'}`} />
+                    <div className={`flex-1 h-0.5 mx-1 ${idx < currentStepIdx ? 'bg-teal-500' : 'bg-gray-100'}`} />
                   )}
                 </div>
               );
@@ -97,7 +97,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
-              <Package size={16} className="text-green-600" />
+              <Package size={16} className="text-teal-600" />
               <h2 className="font-bold text-gray-900">Order Items ({order.items.length})</h2>
             </div>
             <div className="divide-y divide-gray-50">
@@ -124,7 +124,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <span>Delivery</span><span>{formatPrice(order.deliveryFee)}</span>
               </div>
               <div className="flex justify-between font-black text-lg text-gray-900 pt-2 border-t border-gray-100">
-                <span>Total</span><span className="text-green-700">{formatPrice(order.total)}</span>
+                <span>Total</span><span className="text-teal-700">{formatPrice(order.total)}</span>
               </div>
             </div>
           </div>
@@ -139,10 +139,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   onClick={() => updateStatus(order.id, s)}
                   className={`px-3 py-1.5 rounded-xl text-sm font-medium capitalize transition-colors border ${
                     order.status === s
-                      ? 'bg-green-600 text-white border-green-600'
+                      ? 'bg-teal-500 text-white border-teal-500'
                       : s === 'cancelled'
                       ? 'border-red-200 text-red-600 hover:bg-red-50'
-                      : 'border-gray-200 text-gray-600 hover:border-green-400'
+                      : 'border-gray-200 text-gray-600 hover:border-teal-400'
                   }`}
                 >
                   {s}
@@ -156,11 +156,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Phone size={16} className="text-green-600" /> Customer
+              <Phone size={16} className="text-teal-600" /> Customer
             </h2>
             <div className="space-y-2 text-sm">
               <p className="font-semibold text-gray-900">{order.customer.firstName} {order.customer.lastName}</p>
-              <a href={`tel:${order.customer.phone}`} className="block text-green-600 hover:underline font-medium">
+              <a href={`tel:${order.customer.phone}`} className="block text-teal-600 hover:underline font-medium">
                 {order.customer.phone}
               </a>
               {order.customer.email && (
@@ -172,7 +172,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 href={`https://wa.me/${order.customer.phone.replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+                className="inline-flex items-center gap-2 mt-2 bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
               >
                 <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                 WhatsApp Customer
@@ -182,7 +182,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin size={16} className="text-green-600" /> Delivery Address
+              <MapPin size={16} className="text-teal-600" /> Delivery Address
             </h2>
             <div className="text-sm text-gray-600 space-y-1">
               <p className="font-medium text-gray-900">{order.customer.city}, {order.customer.province}</p>
@@ -198,11 +198,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <h2 className="font-bold text-gray-900 mb-3">Payment</h2>
             <div className="flex items-center gap-2">
-              <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full uppercase">
+              <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-1 rounded-full uppercase">
                 {order.paymentMethod.replace('_', ' ')}
               </span>
               {order.status === 'delivered' ? (
-                <span className="text-green-600 text-xs font-medium">✅ Paid</span>
+                <span className="text-teal-600 text-xs font-medium">✅ Paid</span>
               ) : (
                 <span className="text-orange-500 text-xs font-medium">⏳ Due on delivery</span>
               )}

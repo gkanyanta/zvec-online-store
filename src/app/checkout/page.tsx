@@ -83,7 +83,7 @@ export default function CheckoutPage() {
         <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" strokeWidth={1} />
         <h2 className="text-2xl font-bold text-gray-700 mb-2">Your cart is empty</h2>
         <p className="text-gray-500 mb-6">Add some products before checking out.</p>
-        <Link href="/products" className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-xl transition-colors">
+        <Link href="/products" className="bg-teal-500 hover:bg-teal-600 text-white font-bold px-8 py-3 rounded-xl transition-colors">
           Shop Now
         </Link>
       </div>
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Link href="/products" className="inline-flex items-center gap-2 text-gray-500 hover:text-green-600 text-sm mb-6">
+      <Link href="/products" className="inline-flex items-center gap-2 text-gray-500 hover:text-teal-600 text-sm mb-6">
         <ArrowLeft size={16} /> Continue Shopping
       </Link>
 
@@ -112,7 +112,7 @@ export default function CheckoutPage() {
                     type="text"
                     value={form.firstName}
                     onChange={(e) => update('firstName', e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 ${errors.firstName ? 'border-red-400' : 'border-gray-200'}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 ${errors.firstName ? 'border-red-400' : 'border-gray-200'}`}
                     placeholder="John"
                   />
                   {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
                     type="text"
                     value={form.lastName}
                     onChange={(e) => update('lastName', e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 ${errors.lastName ? 'border-red-400' : 'border-gray-200'}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 ${errors.lastName ? 'border-red-400' : 'border-gray-200'}`}
                     placeholder="Banda"
                   />
                   {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
@@ -134,7 +134,7 @@ export default function CheckoutPage() {
                     type="tel"
                     value={form.phone}
                     onChange={(e) => update('phone', e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 ${errors.phone ? 'border-red-400' : 'border-gray-200'}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 ${errors.phone ? 'border-red-400' : 'border-gray-200'}`}
                     placeholder="+260 97X XXX XXX"
                   />
                   {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -145,7 +145,7 @@ export default function CheckoutPage() {
                     type="email"
                     value={form.email}
                     onChange={(e) => update('email', e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
                     placeholder="john@example.com"
                   />
                   {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
@@ -156,7 +156,7 @@ export default function CheckoutPage() {
             {/* Delivery address */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="font-bold text-gray-900 text-lg mb-4 flex items-center gap-2">
-                <Truck size={20} className="text-green-600" /> Delivery Address
+                <Truck size={20} className="text-teal-600" /> Delivery Address
               </h2>
               <div className="space-y-4">
                 <div>
@@ -164,7 +164,7 @@ export default function CheckoutPage() {
                   <select
                     value={form.province}
                     onChange={(e) => update('province', e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400"
                   >
                     {zambianProvinces.map((p) => (
                       <option key={p}>{p}</option>
@@ -180,7 +180,7 @@ export default function CheckoutPage() {
                     type="text"
                     value={form.city}
                     onChange={(e) => update('city', e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 ${errors.city ? 'border-red-400' : 'border-gray-200'}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 ${errors.city ? 'border-red-400' : 'border-gray-200'}`}
                     placeholder="Lusaka"
                   />
                   {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
@@ -191,7 +191,7 @@ export default function CheckoutPage() {
                     value={form.address}
                     onChange={(e) => update('address', e.target.value)}
                     rows={3}
-                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 resize-none ${errors.address ? 'border-red-400' : 'border-gray-200'}`}
+                    className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 resize-none ${errors.address ? 'border-red-400' : 'border-gray-200'}`}
                     placeholder="House No. 12, Roma, near Roma Primary School..."
                   />
                   {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
@@ -202,7 +202,7 @@ export default function CheckoutPage() {
                     value={form.notes}
                     onChange={(e) => update('notes', e.target.value)}
                     rows={2}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 resize-none"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 resize-none"
                     placeholder="Any special delivery instructions..."
                   />
                 </div>
@@ -213,28 +213,28 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="font-bold text-gray-900 text-lg mb-4">Payment Method</h2>
               <div className="space-y-3">
-                <label className={`flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <label className={`flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'cod' ? 'border-teal-400 bg-teal-50' : 'border-gray-200 hover:border-gray-300'}`}>
                   <input
                     type="radio"
                     name="payment"
                     value="cod"
                     checked={paymentMethod === 'cod'}
                     onChange={() => setPaymentMethod('cod')}
-                    className="mt-0.5 accent-green-600"
+                    className="mt-0.5 accent-teal-500"
                   />
                   <div>
                     <div className="font-semibold text-gray-900">Cash on Delivery</div>
                     <div className="text-sm text-gray-500 mt-0.5">Pay in cash when your order is delivered to your door. No upfront payment required.</div>
                   </div>
                 </label>
-                <label className={`flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'mobile_money' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <label className={`flex items-start gap-3 p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'mobile_money' ? 'border-teal-400 bg-teal-50' : 'border-gray-200 hover:border-gray-300'}`}>
                   <input
                     type="radio"
                     name="payment"
                     value="mobile_money"
                     checked={paymentMethod === 'mobile_money'}
                     onChange={() => setPaymentMethod('mobile_money')}
-                    className="mt-0.5 accent-green-600"
+                    className="mt-0.5 accent-teal-500"
                   />
                   <div>
                     <div className="font-semibold text-gray-900 flex items-center gap-2">
@@ -288,11 +288,11 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between font-black text-lg text-gray-900 pt-2 border-t border-gray-100">
                   <span>Total</span>
-                  <span className="text-green-700">{formatPrice(orderTotal)}</span>
+                  <span className="text-teal-700">{formatPrice(orderTotal)}</span>
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-green-50 rounded-xl text-xs text-green-700 flex items-start gap-2">
+              <div className="mt-4 p-3 bg-teal-50 rounded-xl text-xs text-teal-700 flex items-start gap-2">
                 <Check size={14} className="shrink-0 mt-0.5" />
                 <span>Cash on Delivery — pay only when you receive your order.</span>
               </div>
@@ -300,7 +300,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || paymentMethod === 'mobile_money'}
-                className="w-full mt-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+                className="w-full mt-4 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

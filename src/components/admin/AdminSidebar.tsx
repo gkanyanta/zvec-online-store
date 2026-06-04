@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingBag, Package, Users,
-  LogOut, ExternalLink, ChevronRight, X,
+  LogOut, ExternalLink, ChevronRight, X, Gift,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/admin';
 import { useOrdersStore } from '@/store/orders';
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { href: '/admin/products', label: 'Products', icon: Package },
+  { href: '/admin/packages', label: 'Packages', icon: Gift },
   { href: '/admin/customers', label: 'Customers', icon: Users },
 ];
 
@@ -41,10 +42,10 @@ export default function AdminSidebar({ onClose }: Props) {
       {/* Logo */}
       <div className="flex items-center justify-between p-5 border-b border-gray-800">
         <div className="flex items-center gap-2">
-          <div className="bg-green-600 text-white font-black text-base px-2.5 py-1 rounded-lg">ZVEC</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/zvec-logo.png" alt="ZVEC" className="h-8 object-contain brightness-0 invert" />
           <div>
-            <div className="text-white font-bold text-sm leading-tight">Admin Panel</div>
-            <div className="text-gray-400 text-xs">Store Management</div>
+            <div className="text-gray-400 text-xs mt-0.5">Admin Panel</div>
           </div>
         </div>
         {onClose && (
@@ -65,7 +66,7 @@ export default function AdminSidebar({ onClose }: Props) {
               onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors group ${
                 active
-                  ? 'bg-green-600 text-white'
+                  ? 'bg-teal-500 text-white'
                   : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}
             >

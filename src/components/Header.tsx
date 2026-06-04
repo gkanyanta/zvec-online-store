@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart, Search, Menu, X, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useCartStore } from '@/store/cart';
@@ -21,13 +22,13 @@ export default function Header() {
 
   return (
     <>
-      {/* Top bar */}
-      <div className="bg-green-800 text-white text-sm py-2 px-4 flex items-center justify-between">
+      {/* Top bar — navy from logo */}
+      <div className="bg-[#1e3a8a] text-white text-sm py-2 px-4 flex items-center justify-between">
         <span className="hidden sm:flex items-center gap-2">
           <Phone size={14} />
           <span>+260 97X XXX XXX &nbsp;|&nbsp; Cash on Delivery Available Nationwide</span>
         </span>
-        <span className="text-green-200 text-xs sm:text-sm font-medium">
+        <span className="text-teal-300 text-xs sm:text-sm font-medium">
           🛡️ Trusted Zambian Store &nbsp;•&nbsp; Genuine Products Guaranteed
         </span>
       </div>
@@ -37,14 +38,15 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="bg-green-600 text-white font-black text-xl px-3 py-1 rounded-lg tracking-tight">
-                ZVEC
-              </div>
-              <div className="hidden sm:block">
-                <div className="font-bold text-gray-900 leading-tight text-sm">Online Store</div>
-                <div className="text-xs text-green-600">Trusted. Affordable. Zambian.</div>
-              </div>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/zvec-logo.png"
+                alt="ZVEC Online Store"
+                width={140}
+                height={52}
+                className="object-contain"
+                priority
+              />
             </Link>
 
             {/* Desktop nav */}
@@ -53,7 +55,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-gray-700 hover:text-green-600 font-medium text-sm transition-colors"
+                  className="text-gray-700 hover:text-teal-600 font-medium text-sm transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -62,13 +64,13 @@ export default function Header() {
 
             {/* Right actions */}
             <div className="flex items-center gap-3">
-              <Link href="/products" className="hidden sm:flex items-center gap-2 text-gray-500 hover:text-green-600 transition-colors">
+              <Link href="/products" className="hidden sm:flex items-center gap-2 text-gray-500 hover:text-teal-600 transition-colors">
                 <Search size={20} />
               </Link>
 
               <button
                 onClick={openCart}
-                className="relative flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors"
+                className="relative flex items-center gap-1 bg-teal-500 hover:bg-teal-600 text-white px-3 py-2 rounded-lg transition-colors"
               >
                 <ShoppingCart size={18} />
                 <span className="hidden sm:inline text-sm font-medium">Cart</span>
@@ -97,7 +99,7 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="block py-2 text-gray-700 hover:text-green-600 font-medium"
+                className="block py-2 text-gray-700 hover:text-teal-600 font-medium"
               >
                 {link.label}
               </Link>

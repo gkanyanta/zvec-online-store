@@ -3,11 +3,13 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
-import { products, categories } from '@/lib/data';
+import { categories } from '@/lib/data';
+import { useInventoryStore } from '@/store/inventory';
 import ProductCard from '@/components/ProductCard';
 import { Suspense } from 'react';
 
 function ProductsContent() {
+  const products = useInventoryStore((s) => s.products);
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
 
@@ -57,7 +59,7 @@ function ProductsContent() {
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-green-400 text-sm"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-teal-400 text-sm"
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -68,7 +70,7 @@ function ProductsContent() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-green-400 hidden sm:block"
+          className="border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 hidden sm:block"
         >
           <option value="default">Sort: Default</option>
           <option value="price-asc">Price: Low to High</option>
@@ -77,7 +79,7 @@ function ProductsContent() {
         </select>
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm hover:border-green-400 sm:hidden"
+          className="flex items-center gap-2 border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm hover:border-teal-400 sm:hidden"
         >
           <SlidersHorizontal size={16} />
           Filter
@@ -97,7 +99,7 @@ function ProductsContent() {
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedCategory === cat.id
-                      ? 'bg-green-600 text-white font-medium'
+                      ? 'bg-teal-500 text-white font-medium'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
@@ -118,11 +120,11 @@ function ProductsContent() {
               step={500}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-green-600"
+              className="w-full accent-teal-500"
             />
             <div className="flex justify-between text-sm text-gray-500 mt-1">
               <span>K500</span>
-              <span className="font-semibold text-green-700">K{maxPrice.toLocaleString()}</span>
+              <span className="font-semibold text-teal-700">K{maxPrice.toLocaleString()}</span>
             </div>
           </div>
         </aside>
@@ -139,8 +141,8 @@ function ProductsContent() {
                     onClick={() => { setSelectedCategory(cat.id); setShowFilters(false); }}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border transition-colors ${
                       selectedCategory === cat.id
-                        ? 'bg-green-600 text-white border-green-600 font-medium'
-                        : 'text-gray-600 border-gray-200 hover:border-green-300'
+                        ? 'bg-teal-500 text-white border-teal-500 font-medium'
+                        : 'text-gray-600 border-gray-200 hover:border-teal-300'
                     }`}
                   >
                     <span>{cat.icon}</span>
@@ -171,7 +173,7 @@ function ProductsContent() {
               <p className="text-gray-500 mb-4">Try adjusting your filters or search query.</p>
               <button
                 onClick={() => { setSelectedCategory('all'); setSearchQuery(''); setMaxPrice(20000); }}
-                className="text-green-600 hover:text-green-700 font-medium"
+                className="text-teal-600 hover:text-teal-700 font-medium"
               >
                 Clear all filters
               </button>

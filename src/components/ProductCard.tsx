@@ -18,15 +18,14 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
       {/* Image */}
       <Link href={`/products/${product.slug}`} className="block relative aspect-square overflow-hidden bg-gray-50">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-        />
+        {product.image.startsWith('data:') ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        ) : (
+          <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
+        )}
         {product.badge && (
-          <span className="absolute top-2 left-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+          <span className="absolute top-2 left-2 bg-teal-500 text-white text-xs font-bold px-2 py-1 rounded-full">
             {product.badge}
           </span>
         )}
@@ -48,13 +47,13 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Info */}
       <div className="p-3">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="text-sm font-medium text-gray-800 line-clamp-2 hover:text-green-600 transition-colors mb-1">
+          <h3 className="text-sm font-medium text-gray-800 line-clamp-2 hover:text-teal-600 transition-colors mb-1">
             {product.name}
           </h3>
         </Link>
 
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-green-700 font-bold text-base">{formatPrice(product.price)}</span>
+          <span className="text-teal-700 font-bold text-base">{formatPrice(product.price)}</span>
           {product.originalPrice && (
             <span className="text-gray-400 text-xs line-through">{formatPrice(product.originalPrice)}</span>
           )}
@@ -63,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button
           onClick={() => addItem(product)}
           disabled={!product.inStock}
-          className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium text-sm py-2 rounded-lg transition-colors"
+          className="w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium text-sm py-2 rounded-lg transition-colors"
         >
           <ShoppingCart size={15} />
           Add to Cart

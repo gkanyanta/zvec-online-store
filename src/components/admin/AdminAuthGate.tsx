@@ -25,13 +25,14 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl mb-4">
-            <Lock size={28} className="text-green-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-100 rounded-2xl mb-4">
+            <Lock size={28} className="text-teal-600" />
           </div>
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <div className="bg-green-600 text-white font-black text-lg px-2.5 py-0.5 rounded-lg">ZVEC</div>
-            <span className="font-bold text-gray-900">Admin Panel</span>
+          <div className="flex items-center justify-center mb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/zvec-logo.png" alt="ZVEC Online Store" className="h-12 object-contain" />
           </div>
+          <div className="text-gray-600 font-semibold text-sm">Admin Panel</div>
           <p className="text-gray-500 text-sm">Enter your PIN to access the dashboard</p>
         </div>
 
@@ -44,7 +45,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
                 value={pin}
                 onChange={(e) => { setPin(e.target.value); setError(''); }}
                 placeholder="Enter PIN"
-                className={`w-full border rounded-xl px-4 py-3 pr-10 text-center text-xl tracking-widest focus:outline-none focus:border-green-400 ${
+                className={`w-full border rounded-xl px-4 py-3 pr-10 text-center text-xl tracking-widest focus:outline-none focus:border-teal-400 ${
                   error ? 'border-red-400 bg-red-50' : 'border-gray-200'
                 }`}
                 autoFocus
@@ -62,7 +63,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
 
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-colors"
+            className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-xl transition-colors"
           >
             Login
           </button>

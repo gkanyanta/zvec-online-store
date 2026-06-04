@@ -39,7 +39,7 @@ export default function AdminProductsPage() {
         </div>
         <Link
           href="/admin/products/new"
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors"
+          className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors"
         >
           <Plus size={16} /> Add Product
         </Link>
@@ -54,13 +54,13 @@ export default function AdminProductsPage() {
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-green-400 text-sm"
+            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-teal-400 text-sm"
           />
         </div>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-green-400"
+          className="border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400"
         >
           {categories.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -69,7 +69,7 @@ export default function AdminProductsPage() {
         <select
           value={stockFilter}
           onChange={(e) => setStockFilter(e.target.value as 'all' | 'in' | 'out')}
-          className="border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-green-400"
+          className="border border-gray-200 rounded-xl bg-white px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400"
         >
           <option value="all">All Stock</option>
           <option value="in">In Stock</option>
@@ -107,7 +107,7 @@ export default function AdminProductsPage() {
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-gray-900 line-clamp-2">{product.name}</p>
                           {product.badge && (
-                            <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">
+                            <span className="text-xs bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded-full font-medium">
                               {product.badge}
                             </span>
                           )}
@@ -129,7 +129,7 @@ export default function AdminProductsPage() {
                       <button
                         onClick={() => toggleStock(product.id)}
                         className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                          product.inStock ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'
+                          product.inStock ? 'text-teal-600 hover:text-teal-700' : 'text-red-500 hover:text-red-600'
                         }`}
                       >
                         {product.inStock ? (
@@ -142,10 +142,9 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Link
-                          href={`/products/${product.slug}`}
-                          target="_blank"
-                          className="text-gray-400 hover:text-blue-500 p-1"
-                          title="View on storefront"
+                          href={`/admin/products/${product.id}/edit`}
+                          className="text-gray-400 hover:text-teal-600 p-1"
+                          title="Edit product"
                         >
                           <Edit2 size={14} />
                         </Link>

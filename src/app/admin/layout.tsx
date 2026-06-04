@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Menu size={22} />
             </button>
             <div className="flex items-center gap-2">
-              <div className="bg-green-600 text-white font-black text-sm px-2 py-0.5 rounded-lg">ZVEC</div>
+              <div className="bg-teal-500 text-white font-black text-sm px-2 py-0.5 rounded-lg">ZVEC</div>
               <span className="font-semibold text-gray-900 text-sm">Admin Panel</span>
             </div>
           </div>

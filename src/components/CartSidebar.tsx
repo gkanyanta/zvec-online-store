@@ -26,7 +26,7 @@ export default function CartSidebar() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="font-bold text-lg flex items-center gap-2">
-            <ShoppingCart size={20} className="text-green-600" />
+            <ShoppingCart size={20} className="text-teal-600" />
             Your Cart ({items.length})
           </h2>
           <button onClick={closeCart} className="text-gray-500 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100">
@@ -42,7 +42,7 @@ export default function CartSidebar() {
               <p className="font-medium">Your cart is empty</p>
               <button
                 onClick={closeCart}
-                className="text-green-600 font-medium hover:underline text-sm"
+                className="text-teal-600 font-medium hover:underline text-sm"
               >
                 Continue Shopping
               </button>
@@ -63,18 +63,18 @@ export default function CartSidebar() {
                   <h4 className="text-sm font-medium text-gray-800 line-clamp-2 mb-1">
                     {item.product.name}
                   </h4>
-                  <p className="text-green-700 font-bold text-sm">{formatPrice(item.product.price)}</p>
+                  <p className="text-teal-700 font-bold text-sm">{formatPrice(item.product.price)}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-green-500 hover:text-green-600"
+                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-teal-400 hover:text-teal-600"
                     >
                       <Minus size={12} />
                     </button>
                     <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-green-500 hover:text-green-600"
+                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:border-teal-400 hover:text-teal-600"
                     >
                       <Plus size={12} />
                     </button>
@@ -102,7 +102,7 @@ export default function CartSidebar() {
             <Link
               href="/checkout"
               onClick={closeCart}
-              className="block w-full bg-green-600 hover:bg-green-700 text-white text-center font-bold py-3 rounded-xl transition-colors"
+              className="block w-full bg-teal-500 hover:bg-teal-600 text-white text-center font-bold py-3 rounded-xl transition-colors"
             >
               Proceed to Checkout
             </Link>

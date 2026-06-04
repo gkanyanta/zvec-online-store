@@ -88,7 +88,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
           <p className="text-gray-500 text-sm">{new Date().toLocaleDateString('en-ZM', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
-        <Link href="/admin/orders" className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition-colors">
+        <Link href="/admin/orders" className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium px-4 py-2 rounded-xl text-sm transition-colors">
           <ShoppingBag size={16} /> View Orders
         </Link>
       </div>
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50', change: '+12%' },
+          { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: 'text-teal-600', bg: 'bg-teal-50', change: '+12%' },
           { label: 'Total Orders', value: stats.totalOrders, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50', change: `${stats.pendingOrders} pending` },
           { label: 'Customers', value: stats.uniqueCustomers, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50', change: 'unique' },
           { label: 'Delivered', value: stats.deliveredOrders, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', change: `of ${stats.totalOrders}` },
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
                 <div className="text-xs text-gray-500 font-medium">{day.revenue > 0 ? formatPrice(day.revenue) : ''}</div>
                 <div className="w-full flex items-end" style={{ height: 96 }}>
                   <div
-                    className="w-full bg-green-500 rounded-t-lg transition-all hover:bg-green-600"
+                    className="w-full bg-teal-500 rounded-t-lg transition-all hover:bg-teal-500"
                     style={{ height: `${Math.max((day.revenue / maxRevenue) * 96, day.revenue > 0 ? 4 : 0)}px` }}
                   />
                 </div>
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full">
                     <div
-                      className="h-full bg-green-500 rounded-full transition-all"
+                      className="h-full bg-teal-500 rounded-full transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="font-bold text-gray-900">Recent Orders</h2>
-            <Link href="/admin/orders" className="text-green-600 text-sm hover:text-green-700 flex items-center gap-1">
+            <Link href="/admin/orders" className="text-teal-600 text-sm hover:text-teal-700 flex items-center gap-1">
               View all <ChevronRight size={14} />
             </Link>
           </div>
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="font-bold text-gray-900">Top Products</h2>
-            <Link href="/admin/products" className="text-green-600 text-sm hover:text-green-700 flex items-center gap-1">
+            <Link href="/admin/products" className="text-teal-600 text-sm hover:text-teal-700 flex items-center gap-1">
               Manage <ChevronRight size={14} />
             </Link>
           </div>
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
                   <p className="text-xs font-medium text-gray-800 line-clamp-2">{item.name}</p>
                   <p className="text-xs text-gray-400">{item.count} sold</p>
                 </div>
-                <span className="text-xs font-bold text-green-700 shrink-0">{formatPrice(item.revenue)}</span>
+                <span className="text-xs font-bold text-teal-700 shrink-0">{formatPrice(item.revenue)}</span>
               </div>
             ))}
           </div>
@@ -237,17 +237,17 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-gray-900 flex items-center gap-2">
-            <Package size={18} className="text-green-600" />
+            <Package size={18} className="text-teal-600" />
             Inventory Overview
           </h2>
-          <Link href="/admin/products" className="text-green-600 text-sm hover:text-green-700 flex items-center gap-1">
+          <Link href="/admin/products" className="text-teal-600 text-sm hover:text-teal-700 flex items-center gap-1">
             Manage stock <ChevronRight size={14} />
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="text-center p-3 bg-green-50 rounded-xl">
-            <div className="text-2xl font-black text-green-700">{products.filter((p) => p.inStock).length}</div>
-            <div className="text-xs text-green-600 font-medium">In Stock</div>
+          <div className="text-center p-3 bg-teal-50 rounded-xl">
+            <div className="text-2xl font-black text-teal-700">{products.filter((p) => p.inStock).length}</div>
+            <div className="text-xs text-teal-600 font-medium">In Stock</div>
           </div>
           <div className="text-center p-3 bg-red-50 rounded-xl">
             <div className="text-2xl font-black text-red-600">{products.filter((p) => !p.inStock).length}</div>
