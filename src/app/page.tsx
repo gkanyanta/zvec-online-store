@@ -1,11 +1,12 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Shield, Truck, CreditCard, RotateCcw, Star, ChevronRight } from 'lucide-react';
-import { products, packages, categories } from '@/lib/data';
+import { packages, categories } from '@/lib/data';
+import { sql, toProduct, ensureSchema } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
-
-const featuredProducts = products.filter((p) => p.badge).slice(0, 8);
 
 const trustItems = [
   {
@@ -44,7 +45,15 @@ const packageBorderMap: Record<string, string> = {
   orange: 'border-orange-200 hover:border-orange-400',
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  await ensureSchema();
+  const [featuredRows, moreRows] = await Promise.all([
+    sql`SELECT * FROM products WHERE badge IS NOT NULL LIMIT 8`,
+    sql`SELECT * FROM products LIMIT 8`,
+  ]);
+  const featuredProducts = featuredRows.map(toProduct);
+  const moreProducts = moreRows.map(toProduct);
+
   return (
     <div className="bg-gray-50">
       {/* Hero */}
@@ -230,7 +239,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.slice(0, 8).map((product) => (
+          {moreProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

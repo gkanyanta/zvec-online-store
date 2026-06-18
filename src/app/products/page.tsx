@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { categories } from '@/lib/data';
@@ -10,6 +10,8 @@ import { Suspense } from 'react';
 
 function ProductsContent() {
   const products = useInventoryStore((s) => s.products);
+  const fetchProducts = useInventoryStore((s) => s.fetchProducts);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Plus, ToggleLeft, ToggleRight, Trash2, Edit2 } from 'lucide-react';
 import { useInventoryStore } from '@/store/inventory';
@@ -8,7 +8,8 @@ import { categories } from '@/lib/data';
 import { formatPrice } from '@/lib/utils';
 
 export default function AdminProductsPage() {
-  const { products, toggleStock, deleteProduct } = useInventoryStore();
+  const { products, toggleStock, deleteProduct, fetchProducts } = useInventoryStore();
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [stockFilter, setStockFilter] = useState<'all' | 'in' | 'out'>('all');

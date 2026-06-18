@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { Check, ArrowRight, ShoppingCart } from 'lucide-react';
 import { usePackagesStore } from '@/store/packages';
@@ -18,6 +19,8 @@ const packageHeaderColors: Record<string, string> = {
 export default function PackagesPage() {
   const packages = usePackagesStore((s) => s.packages);
   const products = useInventoryStore((s) => s.products);
+  const fetchProducts = useInventoryStore((s) => s.fetchProducts);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const addItem = useCartStore((s) => s.addItem);
 
   function addPackageToCart(productIds: string[]) {

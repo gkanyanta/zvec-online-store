@@ -15,7 +15,7 @@ export default function NewProductPage() {
     setSaving(true);
     await new Promise((r) => setTimeout(r, 400));
     const slug = data.slug ?? data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    addProduct({ id: `p${Date.now()}`, slug, ...data } as Product);
+    await addProduct({ id: `p${Date.now()}`, slug, ...data } as Product);
     router.push('/admin/products');
   }
 

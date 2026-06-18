@@ -8,11 +8,13 @@ import { useInventoryStore } from '@/store/inventory';
 import { useCartStore } from '@/store/cart';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const products = useInventoryStore((s) => s.products);
+  const fetchProducts = useInventoryStore((s) => s.fetchProducts);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
