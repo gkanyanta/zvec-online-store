@@ -12,6 +12,7 @@ export function toProduct(row: Record<string, unknown>): Product {
     category: row.category as string,
     price: Number(row.price),
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
+    costPrice: row.cost_price != null ? Number(row.cost_price) : undefined,
     image: row.image as string,
     description: row.description as string,
     features: Array.isArray(row.features) ? (row.features as string[]) : [],
@@ -32,6 +33,7 @@ export async function ensureSchema(): Promise<void> {
       category       TEXT    NOT NULL,
       price          NUMERIC NOT NULL,
       original_price NUMERIC,
+      cost_price     NUMERIC,
       image          TEXT    NOT NULL,
       description    TEXT    NOT NULL,
       features       TEXT[]  DEFAULT '{}',
@@ -39,6 +41,7 @@ export async function ensureSchema(): Promise<void> {
       badge          TEXT
     )
   `;
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price NUMERIC`;
   for (const p of seedProducts) {
     await sql`
       INSERT INTO products

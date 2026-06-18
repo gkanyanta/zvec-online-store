@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingBag, TrendingUp, Clock, CheckCircle, Package, Users, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { useOrdersStore, OrderStatus } from '@/store/orders';
-import { products } from '@/lib/data';
+import { useInventoryStore } from '@/store/inventory';
 import { formatPrice } from '@/lib/utils';
 import StatusBadge from '@/components/admin/StatusBadge';
 
@@ -22,11 +22,27 @@ const STATUS_ORDER: OrderStatus[] = ['pending', 'confirmed', 'processing', 'ship
 
 export default function AdminDashboard() {
   const orders = useOrdersStore((s) => s.orders);
+  const products = useInventoryStore((s) => s.products);
+  const fetchProducts = useInventoryStore((s) => s.fetchProducts);
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  const productCostMap = useMemo(
+    () => new Map(products.filter((p) => p.costPrice != null).map((p) => [p.id, p.costPrice!])),
+    [products]
+  );
 
   const stats = useMemo(() => {
-    const totalRevenue = orders
-      .filter((o) => o.status !== 'cancelled')
-      .reduce((sum, o) => sum + o.total, 0);
+    const activeOrders = orders.filter((o) => o.status !== 'cancelled');
+    const totalRevenue = activeOrders.reduce((sum, o) => sum + o.total, 0);
+    const totalProfit = activeOrders.reduce((sum, o) => {
+      return sum + o.items.reduce((s, item) => {
+        const cost = productCostMap.get(item.productId);
+        return cost != null ? s + (item.price - cost) * item.quantity : s;
+      }, 0);
+    }, 0);
+    const profitTracked = activeOrders.some((o) =>
+      o.items.some((item) => productCostMap.has(item.productId))
+    );
     const totalOrders = orders.length;
     const pendingOrders = orders.filter((o) => o.status === 'pending').length;
     const deliveredOrders = orders.filter((o) => o.status === 'delivered').length;
@@ -37,8 +53,8 @@ export default function AdminDashboard() {
       return acc;
     }, {} as Record<OrderStatus, number>);
 
-    return { totalRevenue, totalOrders, pendingOrders, deliveredOrders, uniqueCustomers, statusCounts };
-  }, [orders]);
+    return { totalRevenue, totalProfit, profitTracked, totalOrders, pendingOrders, deliveredOrders, uniqueCustomers, statusCounts };
+  }, [orders, productCostMap]);
 
   const recentOrders = orders.slice(0, 5);
 
@@ -96,10 +112,10 @@ export default function AdminDashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: 'text-teal-600', bg: 'bg-teal-50', change: '+12%' },
+          { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: 'text-teal-600', bg: 'bg-teal-50', change: 'from orders' },
+          { label: 'Total Profit', value: stats.profitTracked ? formatPrice(stats.totalProfit) : 'Add cost prices', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50', change: stats.profitTracked ? `${Math.round((stats.totalProfit / (stats.totalRevenue || 1)) * 100)}% margin` : 'to track profit' },
           { label: 'Total Orders', value: stats.totalOrders, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50', change: `${stats.pendingOrders} pending` },
           { label: 'Customers', value: stats.uniqueCustomers, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50', change: 'unique' },
-          { label: 'Delivered', value: stats.deliveredOrders, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', change: `of ${stats.totalOrders}` },
         ].map((card) => (
           <div key={card.label} className="bg-white rounded-2xl border border-gray-100 p-5">
             <div className="flex items-center justify-between mb-3">
@@ -257,9 +273,9 @@ export default function AdminDashboard() {
             <div className="text-2xl font-black text-blue-600">{products.length}</div>
             <div className="text-xs text-blue-500 font-medium">Total Products</div>
           </div>
-          <div className="text-center p-3 bg-purple-50 rounded-xl">
-            <div className="text-2xl font-black text-purple-600">4</div>
-            <div className="text-xs text-purple-500 font-medium">Packages</div>
+          <div className="text-center p-3 bg-emerald-50 rounded-xl">
+            <div className="text-2xl font-black text-emerald-600">{products.filter((p) => p.costPrice != null).length}</div>
+            <div className="text-xs text-emerald-600 font-medium">Cost Tracked</div>
           </div>
         </div>
       </div>

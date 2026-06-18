@@ -18,6 +18,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       category       = ${merged.category},
       price          = ${merged.price},
       original_price = ${merged.originalPrice ?? null},
+      cost_price     = ${merged.costPrice ?? null},
       image          = ${merged.image},
       description    = ${merged.description},
       features       = ${merged.features ?? []},

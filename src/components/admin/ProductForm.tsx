@@ -21,6 +21,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
     category: initial.category ?? 'televisions',
     price: initial.price?.toString() ?? '',
     originalPrice: initial.originalPrice?.toString() ?? '',
+    costPrice: initial.costPrice?.toString() ?? '',
     image: initial.image ?? '',
     description: initial.description ?? '',
     features: initial.features?.join('\n') ?? '',
@@ -54,6 +55,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
       category: form.category,
       price: Number(form.price),
       originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
+      costPrice: form.costPrice ? Number(form.costPrice) : undefined,
       image: form.image,
       description: form.description.trim(),
       features: form.features ? form.features.split('\n').map((f) => f.trim()).filter(Boolean) : undefined,
@@ -140,7 +142,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
         {/* Pricing */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Pricing</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Selling Price (K) *</label>
               <input
@@ -155,7 +157,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Original Price (K) <span className="text-gray-400 font-normal">— shows a strikethrough</span>
+                Original Price (K) <span className="text-gray-400 font-normal">— strikethrough</span>
               </label>
               <input
                 type="number"
@@ -167,7 +169,32 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
               />
               {errors.originalPrice && <p className="text-red-500 text-xs mt-1">{errors.originalPrice}</p>}
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cost Price (K) <span className="text-gray-400 font-normal">— for profit tracking</span>
+              </label>
+              <input
+                type="number"
+                value={form.costPrice}
+                onChange={(e) => update('costPrice', e.target.value)}
+                placeholder="3200"
+                min={0}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400"
+              />
+            </div>
           </div>
+          {/* Live margin preview */}
+          {form.price && form.costPrice && Number(form.price) > 0 && Number(form.costPrice) > 0 && (
+            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2.5 text-sm">
+              <span className="text-emerald-700 font-medium">Profit per unit:</span>
+              <span className="font-bold text-emerald-800">
+                K{(Number(form.price) - Number(form.costPrice)).toLocaleString()}
+              </span>
+              <span className="text-emerald-600">
+                ({Math.round(((Number(form.price) - Number(form.costPrice)) / Number(form.price)) * 100)}% margin)
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Image */}

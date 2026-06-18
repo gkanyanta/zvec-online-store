@@ -92,6 +92,7 @@ export default function AdminProductsPage() {
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Product</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Category</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Price</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Margin</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Stock</th>
                   <th className="px-4 py-3"></th>
                 </tr>
@@ -125,6 +126,20 @@ export default function AdminProductsPage() {
                           <span className="text-xs text-gray-400 line-through ml-1">{formatPrice(product.originalPrice)}</span>
                         )}
                       </div>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      {product.costPrice != null ? (
+                        <div>
+                          <span className="text-sm font-semibold text-emerald-600">
+                            K{(product.price - product.costPrice).toLocaleString()}
+                          </span>
+                          <span className="text-xs text-gray-400 ml-1">
+                            ({Math.round(((product.price - product.costPrice) / product.price) * 100)}%)
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-300 text-sm">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <button
