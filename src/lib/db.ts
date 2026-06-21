@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
-import type { Product, Expense, BizDocument, DocumentItem } from '@/types';
+import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod } from '@/types';
 
 export const sql = neon(process.env.DATABASE_URL!);
 
@@ -58,6 +58,21 @@ export function toDocument(row: Record<string, unknown>): BizDocument {
   };
 }
 
+export function toOrder(row: Record<string, unknown>): Order {
+  return {
+    id: row.id as string,
+    customer: row.customer as Order['customer'],
+    items: row.items as OrderItem[],
+    subtotal: Number(row.subtotal),
+    deliveryFee: Number(row.delivery_fee),
+    total: Number(row.total),
+    paymentMethod: row.payment_method as PaymentMethod,
+    status: row.status as OrderStatus,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
 let ready = false;
 
 export async function ensureSchema(): Promise<void> {
@@ -83,6 +98,21 @@ export async function ensureSchema(): Promise<void> {
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price NUMERIC`;
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS stock_quantity INTEGER`;
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS low_stock_threshold INTEGER DEFAULT 5`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS orders (
+      id             TEXT        PRIMARY KEY,
+      customer       JSONB       NOT NULL DEFAULT '{}',
+      items          JSONB       NOT NULL DEFAULT '[]',
+      subtotal       NUMERIC     NOT NULL DEFAULT 0,
+      delivery_fee   NUMERIC     NOT NULL DEFAULT 0,
+      total          NUMERIC     NOT NULL DEFAULT 0,
+      payment_method TEXT        NOT NULL DEFAULT 'cod',
+      status         TEXT        NOT NULL DEFAULT 'pending',
+      created_at     TIMESTAMPTZ DEFAULT NOW(),
+      updated_at     TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
 
   await sql`
     CREATE TABLE IF NOT EXISTS expenses (

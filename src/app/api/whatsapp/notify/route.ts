@@ -42,7 +42,7 @@ export async function POST(req: Request) {
           `Phone: ${order.customer.phone}\n` +
           `City: ${order.customer.city}\n\n` +
           `Items:\n${itemsList}\n\n` +
-          `Total: K${order.total.toLocaleString()}\n` +
+          `Total: K${order.total.toLocaleString('en-ZM')}\n` +
           `Payment: ${order.paymentMethod.replace('_', ' ').toUpperCase()}`
         );
       }
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
           order.customer.phone,
           `Hi ${order.customer.firstName}! 👋\n\n` +
           `Your order *${order.id}* has been received by ZVEC.\n\n` +
-          `Total: *K${order.total.toLocaleString()}*\n` +
+          `Total: *K${order.total.toLocaleString('en-ZM')}*\n` +
           `Payment: Cash on Delivery\n\n` +
           `We'll confirm your order shortly. Thank you for shopping with us! 🙏`
         );
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
         confirmed:
           `Hi ${order.customer.firstName}! ✅\n\nYour order *${order.id}* has been confirmed and is being prepared. We'll update you when it ships.`,
         shipped:
-          `Hi ${order.customer.firstName}! 🚚\n\nGreat news! Your order *${order.id}* is on its way to ${order.customer.city}.\n\nPlease have *K${order.total.toLocaleString()}* ready for Cash on Delivery.`,
+          `Hi ${order.customer.firstName}! 🚚\n\nGreat news! Your order *${order.id}* is on its way to ${order.customer.city}.\n\nPlease have *K${order.total.toLocaleString('en-ZM')}* ready for Cash on Delivery.`,
         delivered:
           `Hi ${order.customer.firstName}! 🎉\n\nYour order *${order.id}* has been delivered. Thank you for shopping with ZVEC!\n\nWe hope you enjoy your purchase. 😊`,
         cancelled:

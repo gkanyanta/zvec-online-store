@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql, toProduct, ensureSchema } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const authErr = requireAdmin(req);
+  if (authErr) return authErr;
   await ensureSchema();
   const {
     id, name, slug, category, price, originalPrice, costPrice,

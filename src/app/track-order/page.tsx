@@ -7,7 +7,7 @@ import {
   Search, Package, CheckCircle, Clock, Truck, MapPin,
   Phone, MessageCircle, ChevronRight, XCircle, AlertCircle,
 } from 'lucide-react';
-import { useOrdersStore, Order, OrderStatus } from '@/store/orders';
+import type { Order, OrderStatus } from '@/types';
 import { formatPrice } from '@/lib/utils';
 
 // ─── status config ───────────────────────────────────────────────────────────
@@ -240,7 +240,6 @@ function OrderTracker({ order }: { order: Order }) {
 
 function TrackOrderContent() {
   const searchParams = useSearchParams();
-  const orders = useOrdersStore((s) => s.orders);
 
   const [query, setQuery] = useState(searchParams.get('id') ?? '');
   const [submitted, setSubmitted] = useState(!!searchParams.get('id'));
@@ -248,24 +247,26 @@ function TrackOrderContent() {
 
   useEffect(() => {
     if (submitted && query.trim()) {
-      const q = query.trim().toUpperCase();
-      const found = orders.find(
-        (o) => o.id === q || o.customer.phone.replace(/\D/g, '').endsWith(q.replace(/\D/g, ''))
-      );
-      setResult(found ?? 'not-found');
+      lookup(query.trim());
     }
-  }, [submitted, query, orders]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitted]);
+
+  async function lookup(q: string) {
+    setResult(null);
+    try {
+      const res = await fetch(`/api/orders/track?q=${encodeURIComponent(q)}`);
+      setResult(res.ok ? await res.json() : 'not-found');
+    } catch {
+      setResult('not-found');
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!query.trim()) return;
     setSubmitted(true);
-    setResult(null);
-    const q = query.trim().toUpperCase();
-    const found = orders.find(
-      (o) => o.id === q || o.customer.phone.replace(/\D/g, '').endsWith(q.replace(/\D/g, ''))
-    );
-    setResult(found ?? 'not-found');
+    lookup(query.trim());
   }
 
   return (

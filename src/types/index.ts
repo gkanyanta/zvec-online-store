@@ -79,15 +79,37 @@ export interface CartItem {
   quantity: number;
 }
 
+export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type PaymentMethod = 'cod' | 'mobile_money' | 'bank_transfer';
+
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  productImage: string;
+  price: number;
+  quantity: number;
+}
+
 export interface Order {
   id: string;
-  items: CartItem[];
-  customer: CustomerInfo;
+  customer: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+    address: string;
+    city: string;
+    province: string;
+    notes?: string;
+  };
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
   total: number;
-  paymentMethod: 'cod' | 'mobile_money' | 'bank_transfer';
-  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered';
+  paymentMethod: PaymentMethod;
+  status: OrderStatus;
   createdAt: string;
-  deliveryAddress: string;
+  updatedAt: string;
 }
 
 export interface CustomerInfo {

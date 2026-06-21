@@ -7,6 +7,7 @@ import {
   LogOut, ExternalLink, ChevronRight, X, Gift,
   ReceiptText, TrendingUp, Wallet,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import { useAdminStore } from '@/store/admin';
 import { useOrdersStore } from '@/store/orders';
 
@@ -30,7 +31,10 @@ export default function AdminSidebar({ onClose }: Props) {
   const router = useRouter();
   const logout = useAdminStore((s) => s.logout);
   const orders = useOrdersStore((s) => s.orders);
+  const fetchOrders = useOrdersStore((s) => s.fetchOrders);
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
+
+  useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
   function isActive(item: typeof navItems[0]) {
     return item.exact ? pathname === item.href : pathname.startsWith(item.href);

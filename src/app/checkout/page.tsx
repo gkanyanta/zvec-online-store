@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShoppingCart, Check, Truck, AlertCircle } from 'lucide-react';
 import { useCartStore } from '@/store/cart';
 import { useOrdersStore } from '@/store/orders';
-import { useInventoryStore } from '@/store/inventory';
 import { formatPrice } from '@/lib/utils';
 import { zambianProvinces } from '@/lib/data';
 import { CustomerInfo } from '@/types';
@@ -29,7 +28,6 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCartStore();
   const { addOrder } = useOrdersStore();
-  const { deductStock } = useInventoryStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'mobile_money'>('cod');
 
@@ -105,15 +103,8 @@ export default function CheckoutPage() {
         updatedAt: now,
       };
 
-      // Save order to local store
-      addOrder(order);
-
-      // Deduct stock for tracked products (fire and forget)
-      items.forEach((item) => {
-        if (item.product.stockQuantity != null) {
-          deductStock(item.product.id, item.quantity).catch(console.error);
-        }
-      });
+      // Save order to DB (also deducts stock server-side)
+      await addOrder(order);
 
       // Send WhatsApp notifications (fire and forget — don't block the checkout)
       fetch('/api/whatsapp/notify', {

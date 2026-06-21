@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { sql, toProduct } from '@/lib/db';
+import { requireAdmin } from '@/lib/auth';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authErr = requireAdmin(req);
+  if (authErr) return authErr;
   const { id } = await params;
   const body = await req.json();
 
@@ -44,7 +47,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   return NextResponse.json(toProduct(row));
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authErr = requireAdmin(req);
+  if (authErr) return authErr;
   const { id } = await params;
   await sql`DELETE FROM products WHERE id = ${id}`;
   return NextResponse.json({ ok: true });
