@@ -11,15 +11,19 @@ export async function GET() {
 
 export async function POST(req: Request) {
   await ensureSchema();
-  const { id, name, slug, category, price, originalPrice, costPrice, image, description, features, inStock, badge } =
-    await req.json();
+  const {
+    id, name, slug, category, price, originalPrice, costPrice,
+    image, description, features, inStock, badge, stockQuantity, lowStockThreshold,
+  } = await req.json();
 
   const [row] = await sql`
     INSERT INTO products
-      (id, name, slug, category, price, original_price, cost_price, image, description, features, in_stock, badge)
+      (id, name, slug, category, price, original_price, cost_price, image, description,
+       features, in_stock, badge, stock_quantity, low_stock_threshold)
     VALUES
       (${id}, ${name}, ${slug}, ${category}, ${price}, ${originalPrice ?? null}, ${costPrice ?? null},
-       ${image}, ${description}, ${features ?? []}, ${inStock ?? true}, ${badge ?? null})
+       ${image}, ${description}, ${features ?? []}, ${inStock ?? true}, ${badge ?? null},
+       ${stockQuantity ?? null}, ${lowStockThreshold ?? null})
     RETURNING *
   `;
 

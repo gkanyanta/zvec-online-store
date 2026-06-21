@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShoppingCart, Check, Truck, AlertCircle } from 'lucide-react';
 import { useCartStore } from '@/store/cart';
+import { useOrdersStore } from '@/store/orders';
+import { useInventoryStore } from '@/store/inventory';
 import { formatPrice } from '@/lib/utils';
 import { zambianProvinces } from '@/lib/data';
 import { CustomerInfo } from '@/types';
@@ -26,6 +28,8 @@ const DELIVERY_FEES: Record<string, number> = {
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCartStore();
+  const { addOrder } = useOrdersStore();
+  const { deductStock } = useInventoryStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'mobile_money'>('cod');
 
@@ -69,12 +73,61 @@ export default function CheckoutPage() {
     if (items.length === 0) return;
 
     setIsSubmitting(true);
-    // Simulate order placement
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const orderId = `ZVE-${Date.now().toString(36).toUpperCase()}`;
+      const now = new Date().toISOString();
 
-    const orderId = `ZVE-${Date.now().toString(36).toUpperCase()}`;
-    clearCart();
-    router.push(`/order-confirmed?id=${orderId}`);
+      const order = {
+        id: orderId,
+        customer: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          phone: form.phone,
+          email: form.email,
+          address: form.address,
+          city: form.city,
+          province: form.province,
+          notes: form.notes,
+        },
+        items: items.map((item) => ({
+          productId: item.product.id,
+          productName: item.product.name,
+          productImage: item.product.image,
+          price: item.product.price,
+          quantity: item.quantity,
+        })),
+        subtotal,
+        deliveryFee,
+        total: orderTotal,
+        paymentMethod,
+        status: 'pending' as const,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      // Save order to local store
+      addOrder(order);
+
+      // Deduct stock for tracked products (fire and forget)
+      items.forEach((item) => {
+        if (item.product.stockQuantity != null) {
+          deductStock(item.product.id, item.quantity).catch(console.error);
+        }
+      });
+
+      // Send WhatsApp notifications (fire and forget — don't block the checkout)
+      fetch('/api/whatsapp/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'order_placed', order }),
+      }).catch(console.error);
+
+      clearCart();
+      router.push(`/order-confirmed?id=${orderId}`);
+    } catch (err) {
+      console.error('Order placement failed:', err);
+      setIsSubmitting(false);
+    }
   }
 
   if (items.length === 0) {

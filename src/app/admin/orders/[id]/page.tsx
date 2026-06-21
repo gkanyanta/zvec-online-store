@@ -35,6 +35,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const nextStatus = NEXT_STATUS[order.status];
   const currentStepIdx = STATUS_STEPS.indexOf(order.status);
 
+  function changeStatus(newStatus: OrderStatus) {
+    updateStatus(id, newStatus);
+    fetch('/api/whatsapp/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: 'status_update', order: { ...order, status: newStatus } }),
+    }).catch(console.error);
+  }
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       {/* Header */}
@@ -51,7 +60,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         </div>
         {order.status !== 'cancelled' && order.status !== 'delivered' && nextStatus && (
           <button
-            onClick={() => updateStatus(order.id, nextStatus)}
+            onClick={() => changeStatus(nextStatus)}
             className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl transition-colors text-sm"
           >
             <Check size={16} />
@@ -136,7 +145,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               {(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as OrderStatus[]).map((s) => (
                 <button
                   key={s}
-                  onClick={() => updateStatus(order.id, s)}
+                  onClick={() => changeStatus(s)}
                   className={`px-3 py-1.5 rounded-xl text-sm font-medium capitalize transition-colors border ${
                     order.status === s
                       ? 'bg-teal-500 text-white border-teal-500'

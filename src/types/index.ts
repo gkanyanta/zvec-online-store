@@ -12,6 +12,52 @@ export interface Product {
   features?: string[];
   inStock: boolean;
   badge?: string;
+  stockQuantity?: number;
+  lowStockThreshold?: number;
+}
+
+export interface Expense {
+  id: string;
+  category: string;
+  amount: number;
+  date: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface DocumentItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export type DocumentType = 'quote' | 'invoice' | 'receipt';
+export type DocumentStatus =
+  | 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'
+  | 'paid' | 'overdue' | 'cancelled' | 'issued';
+
+export interface BizDocument {
+  id: string;
+  type: DocumentType;
+  number: string;
+  status: DocumentStatus;
+  customer: {
+    name: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+  };
+  items: DocumentItem[];
+  subtotal: number;
+  tax: number;
+  discount: number;
+  total: number;
+  notes?: string;
+  dueDate?: string;
+  linkedDocId?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Package {

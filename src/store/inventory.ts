@@ -8,6 +8,7 @@ interface InventoryStore {
   addProduct: (product: Product) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   toggleStock: (id: string) => void;
+  deductStock: (id: string, qty: number) => Promise<void>;
   deleteProduct: (id: string) => void;
 }
 
@@ -62,6 +63,18 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inStock: newInStock }),
     }).catch(console.error);
+  },
+
+  deductStock: async (id, qty) => {
+    const res = await fetch(`/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adjustQuantity: -qty }),
+    });
+    if (res.ok) {
+      const saved: Product = await res.json();
+      set((s) => ({ products: s.products.map((p) => (p.id === id ? saved : p)) }));
+    }
   },
 
   deleteProduct: (id) => {

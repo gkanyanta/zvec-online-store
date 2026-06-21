@@ -3,9 +3,10 @@
 import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingBag, TrendingUp, Clock, CheckCircle, Package, Users, ChevronRight, ArrowUpRight } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Clock, Package, Users, ChevronRight, ArrowUpRight, Wallet, AlertTriangle } from 'lucide-react';
 import { useOrdersStore, OrderStatus } from '@/store/orders';
 import { useInventoryStore } from '@/store/inventory';
+import { useExpensesStore } from '@/store/expenses';
 import { formatPrice } from '@/lib/utils';
 import StatusBadge from '@/components/admin/StatusBadge';
 
@@ -24,7 +25,25 @@ export default function AdminDashboard() {
   const orders = useOrdersStore((s) => s.orders);
   const products = useInventoryStore((s) => s.products);
   const fetchProducts = useInventoryStore((s) => s.fetchProducts);
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  const { expenses, fetchExpenses } = useExpensesStore();
+  useEffect(() => { fetchProducts(); fetchExpenses(); }, [fetchProducts, fetchExpenses]);
+
+  const thisMonthPrefix = new Date().toISOString().slice(0, 7);
+
+  const thisMonthExpenses = useMemo(() => {
+    return expenses.filter((e) => e.date.startsWith(thisMonthPrefix)).reduce((s, e) => s + e.amount, 0);
+  }, [expenses, thisMonthPrefix]);
+
+  const thisMonthRevenue = useMemo(() => {
+    return orders
+      .filter((o) => o.status !== 'cancelled' && o.createdAt.startsWith(thisMonthPrefix))
+      .reduce((sum, o) => sum + o.total, 0);
+  }, [orders, thisMonthPrefix]);
+
+  const lowStockProducts = useMemo(
+    () => products.filter((p) => p.stockQuantity != null && p.stockQuantity <= (p.lowStockThreshold ?? 5)),
+    [products]
+  );
 
   const productCostMap = useMemo(
     () => new Map(products.filter((p) => p.costPrice != null).map((p) => [p.id, p.costPrice!])),
@@ -113,9 +132,9 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: 'text-teal-600', bg: 'bg-teal-50', change: 'from orders' },
-          { label: 'Total Profit', value: stats.profitTracked ? formatPrice(stats.totalProfit) : 'Add cost prices', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50', change: stats.profitTracked ? `${Math.round((stats.totalProfit / (stats.totalRevenue || 1)) * 100)}% margin` : 'to track profit' },
+          { label: 'This Month Net', value: formatPrice(thisMonthRevenue - thisMonthExpenses), icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50', change: 'revenue minus expenses' },
           { label: 'Total Orders', value: stats.totalOrders, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50', change: `${stats.pendingOrders} pending` },
-          { label: 'Customers', value: stats.uniqueCustomers, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50', change: 'unique' },
+          { label: 'This Month Expenses', value: formatPrice(thisMonthExpenses), icon: Wallet, color: 'text-red-500', bg: 'bg-red-50', change: 'operational costs' },
         ].map((card) => (
           <div key={card.label} className="bg-white rounded-2xl border border-gray-100 p-5">
             <div className="flex items-center justify-between mb-3">
@@ -139,6 +158,25 @@ export default function AdminDashboard() {
           </p>
           <Link href="/admin/orders?status=pending" className="ml-auto text-orange-600 hover:text-orange-700 text-sm font-bold flex items-center gap-1">
             Review <ArrowUpRight size={14} />
+          </Link>
+        </div>
+      )}
+
+      {/* Low stock alert */}
+      {lowStockProducts.length > 0 && (
+        <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+          <AlertTriangle size={18} className="text-red-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-red-800 text-sm font-medium mb-1">
+              {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} running low on stock:
+            </p>
+            <p className="text-red-600 text-xs">
+              {lowStockProducts.slice(0, 3).map((p) => `${p.name} (${p.stockQuantity} left)`).join(' · ')}
+              {lowStockProducts.length > 3 ? ` + ${lowStockProducts.length - 3} more` : ''}
+            </p>
+          </div>
+          <Link href="/admin/products" className="text-red-600 hover:text-red-700 text-sm font-bold flex items-center gap-1 shrink-0">
+            Manage <ArrowUpRight size={14} />
           </Link>
         </div>
       )}

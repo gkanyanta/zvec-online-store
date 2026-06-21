@@ -5,15 +5,19 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingBag, Package, Users,
   LogOut, ExternalLink, ChevronRight, X, Gift,
+  ReceiptText, TrendingUp, Wallet,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/admin';
 import { useOrdersStore } from '@/store/orders';
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
-  { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/packages', label: 'Packages', icon: Gift },
+  { href: '/admin',           label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/admin/orders',    label: 'Orders',    icon: ShoppingBag },
+  { href: '/admin/products',  label: 'Products',  icon: Package },
+  { href: '/admin/packages',  label: 'Packages',  icon: Gift },
+  { href: '/admin/documents', label: 'Documents', icon: ReceiptText },
+  { href: '/admin/expenses',  label: 'Expenses',  icon: Wallet },
+  { href: '/admin/reports',   label: 'Reports',   icon: TrendingUp },
   { href: '/admin/customers', label: 'Customers', icon: Users },
 ];
 
