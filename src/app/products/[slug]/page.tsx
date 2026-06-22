@@ -13,9 +13,18 @@ import { use, useState, useEffect } from 'react';
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const products = useInventoryStore((s) => s.products);
+  const status = useInventoryStore((s) => s.status);
   const fetchProducts = useInventoryStore((s) => s.fetchProducts);
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const product = products.find((p) => p.slug === slug);
+
+  if (status !== 'ready') {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
   if (!product) notFound();
 
   const addItem = useCartStore((s) => s.addItem);
