@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Plus, Truck, Calendar, User, ChevronRight, X, Check } from 'lucide-react';
 import { adminFetch } from '@/lib/adminFetch';
+import { useAuthStore } from '@/store/auth';
 import type { DeliveryRun, DeliveryRunStatus, AdminUser } from '@/types';
 
 const STATUS_TABS: { value: DeliveryRunStatus | 'all'; label: string }[] = [
@@ -32,6 +33,8 @@ function formatDate(iso: string) {
 }
 
 export default function DeliveryPage() {
+  const { user } = useAuthStore();
+  const isDelivery = user?.role === 'delivery';
   const [runs, setRuns] = useState<DeliveryRun[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<DeliveryRunStatus | 'all'>('all');
@@ -103,15 +106,23 @@ export default function DeliveryPage() {
     <div className="p-6 max-w-4xl mx-auto space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-gray-900">Delivery Runs</h1>
-          <p className="text-gray-500 text-sm">Plan and track daily delivery schedules</p>
+          <h1 className="text-2xl font-black text-gray-900">
+            {isDelivery ? 'My Deliveries' : 'Delivery Runs'}
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {isDelivery
+              ? `Showing runs assigned to you, ${user?.name}`
+              : 'Plan and track daily delivery schedules'}
+          </p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
-        >
-          <Plus size={16} /> New Run
-        </button>
+        {!isDelivery && (
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl text-sm"
+          >
+            <Plus size={16} /> New Run
+          </button>
+        )}
       </div>
 
       {/* Tabs */}
@@ -141,7 +152,11 @@ export default function DeliveryPage() {
         <div className="text-center py-20 text-gray-400">
           <Truck size={40} className="mx-auto mb-3 opacity-30" strokeWidth={1} />
           <p className="font-medium">No delivery runs {tab !== 'all' ? `(${STATUS_LABEL[tab as DeliveryRunStatus]})` : ''}</p>
-          <p className="text-sm mt-1">Create one to start planning deliveries</p>
+          <p className="text-sm mt-1">
+            {isDelivery
+              ? 'No runs have been assigned to you yet. Check back later.'
+              : 'Create one to start planning deliveries'}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -173,8 +188,8 @@ export default function DeliveryPage() {
         </div>
       )}
 
-      {/* Create modal */}
-      {showCreate && (
+      {/* Create modal — owner/sales only */}
+      {showCreate && !isDelivery && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between mb-5">

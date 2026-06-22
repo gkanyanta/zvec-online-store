@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql, ensureSchema, toDeliveryRun } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth';
+import { requireAdmin, getUser } from '@/lib/auth';
 import { nanoid } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -10,14 +10,29 @@ export async function GET(req: Request) {
   if (err) return err;
   await ensureSchema();
 
-  const rows = await sql`
-    SELECT dr.*,
-           COUNT(dro.order_id)::int AS order_count
-    FROM delivery_runs dr
-    LEFT JOIN delivery_run_orders dro ON dro.run_id = dr.id
-    GROUP BY dr.id
-    ORDER BY dr.date DESC, dr.created_at DESC
-  `;
+  const caller = getUser(req)!;
+  // Delivery staff only see runs assigned to them
+  const isDelivery = caller.role === 'delivery';
+
+  const rows = isDelivery
+    ? await sql`
+        SELECT dr.*,
+               COUNT(dro.order_id)::int AS order_count
+        FROM delivery_runs dr
+        LEFT JOIN delivery_run_orders dro ON dro.run_id = dr.id
+        WHERE dr.driver_id = ${caller.sub}
+        GROUP BY dr.id
+        ORDER BY dr.date DESC, dr.created_at DESC
+      `
+    : await sql`
+        SELECT dr.*,
+               COUNT(dro.order_id)::int AS order_count
+        FROM delivery_runs dr
+        LEFT JOIN delivery_run_orders dro ON dro.run_id = dr.id
+        GROUP BY dr.id
+        ORDER BY dr.date DESC, dr.created_at DESC
+      `;
+
   return NextResponse.json(rows.map((r) => toDeliveryRun(r)));
 }
 

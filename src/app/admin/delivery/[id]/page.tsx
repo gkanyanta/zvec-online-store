@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Printer, Plus, Trash2, X, Phone, MapPin, Package, ChevronDown } from 'lucide-react';
 import { adminFetch } from '@/lib/adminFetch';
+import { useAuthStore } from '@/store/auth';
 import { formatPrice } from '@/lib/utils';
 import type { DeliveryRun, DeliveryRunStatus, Order } from '@/types';
 
@@ -29,6 +30,8 @@ function fmtDeliveryDate(iso: string) {
 export default function DeliveryRunDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { user } = useAuthStore();
+  const isDelivery = user?.role === 'delivery';
   const [run, setRun] = useState<DeliveryRun | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddOrders, setShowAddOrders] = useState(false);
@@ -144,9 +147,11 @@ export default function DeliveryRunDetailPage({ params }: { params: Promise<{ id
           >
             <Printer size={15} /> Print Manifest
           </Link>
-          <button onClick={deleteRun} className="text-red-400 hover:text-red-600 p-2" title="Delete run">
-            <Trash2 size={16} />
-          </button>
+          {!isDelivery && (
+            <button onClick={deleteRun} className="text-red-400 hover:text-red-600 p-2" title="Delete run">
+              <Trash2 size={16} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -156,22 +161,26 @@ export default function DeliveryRunDetailPage({ params }: { params: Promise<{ id
           <h2 className="font-bold text-gray-900">
             Orders in this Run <span className="text-gray-400 font-normal">({run.orders?.length ?? 0})</span>
           </h2>
-          <button
-            onClick={() => { setShowAddOrders(true); loadAvailableOrders(); }}
-            className="flex items-center gap-1.5 text-sm font-semibold text-teal-600 hover:text-teal-700"
-          >
-            <Plus size={15} /> Add Orders
-          </button>
+          {!isDelivery && (
+            <button
+              onClick={() => { setShowAddOrders(true); loadAvailableOrders(); }}
+              className="flex items-center gap-1.5 text-sm font-semibold text-teal-600 hover:text-teal-700"
+            >
+              <Plus size={15} /> Add Orders
+            </button>
+          )}
         </div>
 
         {!run.orders?.length ? (
           <div className="text-center py-14 text-gray-400">
             <Package size={36} className="mx-auto mb-2 opacity-30" strokeWidth={1} />
             <p className="text-sm">No orders assigned yet</p>
-            <button onClick={() => { setShowAddOrders(true); loadAvailableOrders(); }}
-              className="mt-3 text-teal-600 text-sm font-semibold hover:underline">
-              + Add orders
-            </button>
+            {!isDelivery && (
+              <button onClick={() => { setShowAddOrders(true); loadAvailableOrders(); }}
+                className="mt-3 text-teal-600 text-sm font-semibold hover:underline">
+                + Add orders
+              </button>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
@@ -208,16 +217,18 @@ export default function DeliveryRunDetailPage({ params }: { params: Promise<{ id
                     {order.items.map((item) => `${item.productName} ×${item.quantity}`).join(', ')}
                   </div>
                 </div>
-                <button
-                  onClick={() => removeOrder(order.id)}
-                  disabled={removing === order.id}
-                  className="text-gray-300 hover:text-red-400 disabled:opacity-30 p-1 shrink-0"
-                  title="Remove from run"
-                >
-                  {removing === order.id
-                    ? <div className="w-4 h-4 border-2 border-gray-300 border-t-red-400 rounded-full animate-spin" />
-                    : <X size={16} />}
-                </button>
+                {!isDelivery && (
+                  <button
+                    onClick={() => removeOrder(order.id)}
+                    disabled={removing === order.id}
+                    className="text-gray-300 hover:text-red-400 disabled:opacity-30 p-1 shrink-0"
+                    title="Remove from run"
+                  >
+                    {removing === order.id
+                      ? <div className="w-4 h-4 border-2 border-gray-300 border-t-red-400 rounded-full animate-spin" />
+                      : <X size={16} />}
+                  </button>
+                )}
               </div>
             ))}
           </div>
