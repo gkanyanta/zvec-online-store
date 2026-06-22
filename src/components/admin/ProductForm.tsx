@@ -20,7 +20,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
     name: initial.name ?? '',
     category: initial.category ?? 'televisions',
     price: initial.price?.toString() ?? '',
-    originalPrice: initial.originalPrice?.toString() ?? '',
+    originalPrice: initial.originalPrice?.toString() ?? initial.price?.toString() ?? '',
     costPrice: initial.costPrice?.toString() ?? '',
     image: initial.image ?? '',
     description: initial.description ?? '',
@@ -152,7 +152,16 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
               <input
                 type="number"
                 value={form.price}
-                onChange={(e) => update('price', e.target.value)}
+                onChange={(e) => {
+                  const newPrice = e.target.value;
+                  setForm((f) => ({
+                    ...f,
+                    price: newPrice,
+                    // keep originalPrice in step with price until the admin sets them differently
+                    originalPrice: f.originalPrice === f.price ? newPrice : f.originalPrice,
+                  }));
+                  setErrors((err) => { const n = { ...err }; delete n.price; return n; });
+                }}
                 placeholder="4500"
                 min={1}
                 className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 ${errors.price ? 'border-red-400' : 'border-gray-200'}`}

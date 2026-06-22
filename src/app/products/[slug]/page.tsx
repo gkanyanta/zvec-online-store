@@ -66,7 +66,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 {product.badge}
               </span>
             )}
-            {product.originalPrice && (
+            {product.originalPrice && product.originalPrice > product.price && (
               <span className="absolute top-4 right-4 bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                 -{calculateDiscount(product.originalPrice, product.price)}% OFF
               </span>
@@ -84,7 +84,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
           <div className="flex items-center gap-3 mb-4">
             <span className="text-3xl font-black text-teal-700">{formatPrice(product.price)}</span>
-            {product.originalPrice && (
+            {product.originalPrice && product.originalPrice > product.price && (
               <>
                 <span className="text-xl text-gray-400 line-through">{formatPrice(product.originalPrice)}</span>
                 <span className="bg-orange-100 text-orange-600 text-sm font-bold px-2 py-1 rounded-full">

@@ -29,7 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.badge}
           </span>
         )}
-        {product.originalPrice && (
+        {product.originalPrice && product.originalPrice > product.price && (
           <span className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
             -{calculateDiscount(product.originalPrice, product.price)}%
           </span>
@@ -54,7 +54,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex items-center gap-2 mb-3">
           <span className="text-teal-700 font-bold text-base">{formatPrice(product.price)}</span>
-          {product.originalPrice && (
+          {product.originalPrice && product.originalPrice > product.price && (
             <span className="text-gray-400 text-xs line-through">{formatPrice(product.originalPrice)}</span>
           )}
         </div>
