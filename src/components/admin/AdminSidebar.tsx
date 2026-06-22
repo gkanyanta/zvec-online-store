@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard, ShoppingBag, Package, Users,
+  LayoutDashboard, ShoppingBag, Package, Users, Truck,
   LogOut, ExternalLink, ChevronRight, X, Gift,
   ReceiptText, TrendingUp, Wallet, UserCog,
 } from 'lucide-react';
@@ -12,15 +12,16 @@ import { useAuthStore, type UserRole } from '@/store/auth';
 import { useOrdersStore } from '@/store/orders';
 
 const NAV = [
-  { href: '/admin',           label: 'Dashboard', icon: LayoutDashboard, exact: true, roles: ['owner', 'sales'] as UserRole[] },
-  { href: '/admin/orders',    label: 'Orders',    icon: ShoppingBag,     exact: false, roles: ['owner', 'sales', 'delivery'] as UserRole[] },
-  { href: '/admin/products',  label: 'Products',  icon: Package,         exact: false, roles: ['owner', 'sales'] as UserRole[] },
-  { href: '/admin/packages',  label: 'Packages',  icon: Gift,            exact: false, roles: ['owner', 'sales'] as UserRole[] },
-  { href: '/admin/documents', label: 'Documents', icon: ReceiptText,     exact: false, roles: ['owner', 'sales'] as UserRole[] },
-  { href: '/admin/expenses',  label: 'Expenses',  icon: Wallet,          exact: false, roles: ['owner'] as UserRole[] },
-  { href: '/admin/reports',   label: 'Reports',   icon: TrendingUp,      exact: false, roles: ['owner'] as UserRole[] },
-  { href: '/admin/customers', label: 'Customers', icon: Users,           exact: false, roles: ['owner', 'sales'] as UserRole[] },
-  { href: '/admin/users',     label: 'Users',     icon: UserCog,         exact: false, roles: ['owner'] as UserRole[] },
+  { href: '/admin',            label: 'Dashboard', icon: LayoutDashboard, exact: true,  roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/orders',     label: 'Orders',    icon: ShoppingBag,     exact: false, roles: ['owner', 'sales', 'delivery'] as UserRole[] },
+  { href: '/admin/delivery',   label: 'Delivery',  icon: Truck,           exact: false, roles: ['owner', 'sales', 'delivery'] as UserRole[] },
+  { href: '/admin/products',   label: 'Products',  icon: Package,         exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/packages',   label: 'Packages',  icon: Gift,            exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/documents',  label: 'Documents', icon: ReceiptText,     exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/expenses',   label: 'Expenses',  icon: Wallet,          exact: false, roles: ['owner'] as UserRole[] },
+  { href: '/admin/reports',    label: 'Reports',   icon: TrendingUp,      exact: false, roles: ['owner'] as UserRole[] },
+  { href: '/admin/customers',  label: 'Customers', icon: Users,           exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/users',      label: 'Users',     icon: UserCog,         exact: false, roles: ['owner'] as UserRole[] },
 ];
 
 const ROLE_BADGE: Record<UserRole, string> = {

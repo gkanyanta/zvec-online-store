@@ -11,18 +11,11 @@ import { formatPrice } from '@/lib/utils';
 import { zambianProvinces } from '@/lib/data';
 import { CustomerInfo } from '@/types';
 
-const DELIVERY_FEES: Record<string, number> = {
-  'Lusaka Province': 50,
-  'Copperbelt Province': 150,
-  'Central Province': 120,
-  'Eastern Province': 200,
-  'Luapula Province': 200,
-  'Muchinga Province': 220,
-  'Northern Province': 220,
-  'North-Western Province': 200,
-  'Southern Province': 150,
-  'Western Province': 250,
-};
+function getTomorrow() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -30,6 +23,7 @@ export default function CheckoutPage() {
   const { addOrder } = useOrdersStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'mobile_money'>('cod');
+  const [deliveryDate, setDeliveryDate] = useState('');
 
   const [form, setForm] = useState<CustomerInfo>({
     firstName: '',
@@ -45,7 +39,7 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
 
   const subtotal = total();
-  const deliveryFee = DELIVERY_FEES[form.province] ?? 100;
+  const deliveryFee = 0;
   const orderTotal = subtotal + deliveryFee;
 
   function update(field: keyof CustomerInfo, value: string) {
@@ -99,6 +93,7 @@ export default function CheckoutPage() {
         total: orderTotal,
         paymentMethod,
         status: 'pending' as const,
+        deliveryDate: deliveryDate || undefined,
         createdAt: now,
         updatedAt: now,
       };
@@ -214,8 +209,8 @@ export default function CheckoutPage() {
                       <option key={p}>{p}</option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                    <Truck size={12} /> Delivery fee to {form.province}: {formatPrice(deliveryFee)}
+                  <p className="text-xs text-teal-600 mt-1 flex items-center gap-1 font-medium">
+                    <Truck size={12} /> Free delivery to {form.province}
                   </p>
                 </div>
                 <div>
@@ -249,6 +244,17 @@ export default function CheckoutPage() {
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400 resize-none"
                     placeholder="Any special delivery instructions..."
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Delivery Date (Optional)</label>
+                  <input
+                    type="date"
+                    value={deliveryDate}
+                    min={getTomorrow()}
+                    onChange={(e) => setDeliveryDate(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-400"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Let us know when you&apos;re available — we&apos;ll do our best to accommodate.</p>
                 </div>
               </div>
             </div>
@@ -327,8 +333,8 @@ export default function CheckoutPage() {
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
-                  <span>Delivery ({form.province.split(' ')[0]})</span>
-                  <span>{formatPrice(deliveryFee)}</span>
+                  <span>Delivery</span>
+                  <span className="text-teal-600 font-semibold">FREE</span>
                 </div>
                 <div className="flex justify-between font-black text-lg text-gray-900 pt-2 border-t border-gray-100">
                   <span>Total</span>

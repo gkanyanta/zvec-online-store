@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { neon } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
-import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole } from '@/types';
+import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus } from '@/types';
 
 export const sql = neon(process.env.DATABASE_URL!);
 
@@ -80,6 +80,23 @@ export function toOrder(row: Record<string, unknown>): Order {
     total: Number(row.total),
     paymentMethod: row.payment_method as PaymentMethod,
     status: row.status as OrderStatus,
+    deliveryDate: row.delivery_date ? toISODate(row.delivery_date) : undefined,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+export function toDeliveryRun(row: Record<string, unknown>, orders?: Order[]): DeliveryRun {
+  return {
+    id: row.id as string,
+    label: row.label as string,
+    date: toISODate(row.date),
+    driverId: row.driver_id as string | null,
+    driverName: row.driver_name as string,
+    status: row.status as DeliveryRunStatus,
+    notes: row.notes ? (row.notes as string) : undefined,
+    orderCount: row.order_count != null ? Number(row.order_count) : undefined,
+    orders,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
@@ -168,6 +185,30 @@ export async function ensureSchema(): Promise<void> {
     INSERT INTO doc_sequences (type, last_num)
     VALUES ('quote', 0), ('invoice', 0), ('receipt', 0), ('delivery_note', 0)
     ON CONFLICT DO NOTHING
+  `;
+
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_date DATE`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS delivery_runs (
+      id          TEXT        PRIMARY KEY,
+      label       TEXT        NOT NULL,
+      date        DATE        NOT NULL,
+      driver_id   TEXT,
+      driver_name TEXT        NOT NULL DEFAULT '',
+      status      TEXT        NOT NULL DEFAULT 'planned',
+      notes       TEXT,
+      created_at  TIMESTAMPTZ DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS delivery_run_orders (
+      run_id   TEXT NOT NULL,
+      order_id TEXT NOT NULL,
+      PRIMARY KEY (run_id, order_id)
+    )
   `;
 
   await sql`

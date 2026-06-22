@@ -108,6 +108,23 @@ export interface Order {
   total: number;
   paymentMethod: PaymentMethod;
   status: OrderStatus;
+  deliveryDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DeliveryRunStatus = 'planned' | 'in_progress' | 'completed';
+
+export interface DeliveryRun {
+  id: string;
+  label: string;
+  date: string;
+  driverId: string | null;
+  driverName: string;
+  status: DeliveryRunStatus;
+  notes?: string;
+  orderCount?: number;
+  orders?: Order[];
   createdAt: string;
   updatedAt: string;
 }

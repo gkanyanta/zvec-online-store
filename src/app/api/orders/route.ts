@@ -15,15 +15,15 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   await ensureSchema();
   const order = await req.json();
-  const { id, customer, items, subtotal, deliveryFee, total, paymentMethod, status, createdAt, updatedAt } = order;
+  const { id, customer, items, subtotal, deliveryFee, total, paymentMethod, status, deliveryDate, createdAt, updatedAt } = order;
 
   const [row] = await sql`
     INSERT INTO orders
-      (id, customer, items, subtotal, delivery_fee, total, payment_method, status, created_at, updated_at)
+      (id, customer, items, subtotal, delivery_fee, total, payment_method, status, delivery_date, created_at, updated_at)
     VALUES
       (${id}, ${JSON.stringify(customer)}, ${JSON.stringify(items)},
        ${subtotal}, ${deliveryFee}, ${total}, ${paymentMethod ?? 'cod'},
-       ${status ?? 'pending'}, ${createdAt}, ${updatedAt})
+       ${status ?? 'pending'}, ${deliveryDate ?? null}, ${createdAt}, ${updatedAt})
     RETURNING *
   `;
 
