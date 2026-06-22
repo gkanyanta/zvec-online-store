@@ -13,6 +13,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const product = products.find((p) => p.id === id);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   // Redirect if product genuinely doesn't exist (after hydration)
   useEffect(() => {
@@ -23,9 +24,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
   async function handleSave(data: Omit<Product, 'id' | 'slug'> & { slug?: string }) {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 400));
-    await updateProduct(id, data);
-    router.push('/admin/products');
+    setSaveError('');
+    try {
+      await updateProduct(id, data);
+      router.push('/admin/products');
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save product. Please try again.');
+      setSaving(false);
+    }
   }
 
   if (!product) {
@@ -37,12 +43,19 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <ProductForm
-      title={`Edit: ${product.name}`}
-      backHref="/admin/products"
-      initial={product}
-      onSave={handleSave}
-      saving={saving}
-    />
+    <>
+      {saveError && (
+        <div className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+          {saveError}
+        </div>
+      )}
+      <ProductForm
+        title={`Edit: ${product.name}`}
+        backHref="/admin/products"
+        initial={product}
+        onSave={handleSave}
+        saving={saving}
+      />
+    </>
   );
 }

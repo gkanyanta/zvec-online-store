@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Product } from '@/types';
+import { adminFetch } from '@/lib/adminFetch';
 
 interface InventoryStore {
   products: Product[];
@@ -30,7 +31,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   },
 
   addProduct: async (product) => {
-    const res = await fetch('/api/products', {
+    const res = await adminFetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
@@ -41,7 +42,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   },
 
   updateProduct: async (id, updates) => {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await adminFetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -58,7 +59,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
     set((s) => ({
       products: s.products.map((p) => (p.id === id ? { ...p, inStock: newInStock } : p)),
     }));
-    fetch(`/api/products/${id}`, {
+    adminFetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inStock: newInStock }),
@@ -66,7 +67,7 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   },
 
   deductStock: async (id, qty) => {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await adminFetch(`/api/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ adjustQuantity: -qty }),
@@ -79,6 +80,6 @@ export const useInventoryStore = create<InventoryStore>()((set, get) => ({
 
   deleteProduct: (id) => {
     set((s) => ({ products: s.products.filter((p) => p.id !== id) }));
-    fetch(`/api/products/${id}`, { method: 'DELETE' }).catch(console.error);
+    adminFetch(`/api/products/${id}`, { method: 'DELETE' }).catch(console.error);
   },
 }));
