@@ -1,7 +1,53 @@
 import crypto from 'crypto';
-import { neon } from '@neondatabase/serverless';
+import { neon, neonConfig } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
 import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus } from '@/types';
+
+// WSL2 fix: undici (Node's built-in fetch) tries IPv6 first but it's unroutable in WSL2,
+// causing ETIMEDOUT. Override with an https-module fetch that resolves to IPv4 directly.
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const https = require('https') as typeof import('https');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const dns = require('dns') as typeof import('dns');
+
+  neonConfig.fetchFunction = (url: string | URL, opts: RequestInit = {}): Promise<Response> => {
+    const parsed = new URL(url.toString());
+    return new Promise((resolve, reject) => {
+      dns.lookup(parsed.hostname, { family: 4 }, (err, ip) => {
+        if (err) { reject(err); return; }
+        const body = opts.body as string | undefined;
+        const req = https.request(
+          {
+            hostname: ip,
+            port: 443,
+            path: parsed.pathname + parsed.search,
+            method: opts.method ?? 'GET',
+            headers: { ...(opts.headers as Record<string, string>), host: parsed.hostname },
+            servername: parsed.hostname,
+          },
+          (res) => {
+            const chunks: Buffer[] = [];
+            res.on('data', (c: Buffer) => chunks.push(c));
+            res.on('end', () => {
+              const text = Buffer.concat(chunks).toString();
+              const headers = new Headers();
+              Object.entries(res.headers).forEach(([k, v]) => {
+                if (v) headers.set(k, Array.isArray(v) ? v.join(', ') : v);
+              });
+              resolve(new Response(text, { status: res.statusCode ?? 200, headers }));
+            });
+            res.on('error', reject);
+          }
+        );
+        req.on('error', reject);
+        req.setTimeout(30_000, () => req.destroy(new Error('neon fetch timeout')));
+        if (body) req.write(body);
+        req.end();
+      });
+    });
+  };
+}
 
 export const sql = neon(process.env.DATABASE_URL!);
 
