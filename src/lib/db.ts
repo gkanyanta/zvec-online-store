@@ -154,7 +154,7 @@ export async function ensureSchema(): Promise<void> {
 
   await sql`
     INSERT INTO doc_sequences (type, last_num)
-    VALUES ('quote', 0), ('invoice', 0), ('receipt', 0)
+    VALUES ('quote', 0), ('invoice', 0), ('receipt', 0), ('delivery_note', 0)
     ON CONFLICT DO NOTHING
   `;
 
@@ -175,7 +175,7 @@ export async function ensureSchema(): Promise<void> {
 // Atomically allocate a number AND insert the document in one CTE — prevents sequence gaps.
 export async function insertDocumentAtomic(params: {
   id: string;
-  type: 'quote' | 'invoice' | 'receipt';
+  type: 'quote' | 'invoice' | 'receipt' | 'delivery_note';
   status: string;
   customer: object;
   items: object;
@@ -189,7 +189,7 @@ export async function insertDocumentAtomic(params: {
   now: string;
 }): Promise<BizDocument> {
   const { id, type, status, customer, items, subtotal, tax, discount, total, notes, dueDate, linkedDocId, now } = params;
-  const prefix = type === 'quote' ? 'QT' : type === 'invoice' ? 'INV' : 'REC';
+  const prefix = type === 'quote' ? 'QT' : type === 'invoice' ? 'INV' : type === 'receipt' ? 'REC' : 'DN';
 
   const [row] = await sql`
     WITH seq AS (

@@ -1,11 +1,12 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Phone, MapPin, Package, Clock, Check } from 'lucide-react';
+import { ArrowLeft, Phone, MapPin, Package, Clock, Check, ReceiptText, Truck } from 'lucide-react';
 import { useOrdersStore, OrderStatus } from '@/store/orders';
+import { adminFetch } from '@/lib/adminFetch';
 import { formatPrice } from '@/lib/utils';
 import StatusBadge from '@/components/admin/StatusBadge';
 
@@ -34,6 +35,50 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
   const nextStatus = NEXT_STATUS[order.status];
   const currentStepIdx = STATUS_STEPS.indexOf(order.status);
+  const [creating, setCreating] = useState<'invoice' | 'delivery_note' | null>(null);
+
+  async function createDocument(type: 'invoice' | 'delivery_note') {
+    setCreating(type);
+    try {
+      const customerName = `${order!.customer.firstName} ${order!.customer.lastName}`;
+      const customerAddress = `${order!.customer.address}, ${order!.customer.city}, ${order!.customer.province}`;
+
+      const items = order!.items.map((item) => ({
+        description: item.productName,
+        quantity: item.quantity,
+        unitPrice: type === 'invoice' ? item.price : 0,
+        total: type === 'invoice' ? item.price * item.quantity : 0,
+      }));
+
+      if (type === 'invoice' && order!.deliveryFee > 0) {
+        items.push({ description: 'Delivery Fee', quantity: 1, unitPrice: order!.deliveryFee, total: order!.deliveryFee });
+      }
+
+      const payload = {
+        type,
+        customer: { name: customerName, phone: order!.customer.phone, email: order!.customer.email || undefined, address: customerAddress },
+        items,
+        subtotal: type === 'invoice' ? order!.subtotal : 0,
+        tax: 0,
+        discount: 0,
+        total: type === 'invoice' ? order!.total : 0,
+        notes: `Order ref: ${order!.id}`,
+      };
+
+      const res = await adminFetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Failed to create document');
+      const doc = await res.json();
+      router.push(`/admin/documents/${doc.id}`);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to create document');
+      setCreating(null);
+    }
+  }
 
   function changeStatus(newStatus: OrderStatus) {
     updateStatus(id, newStatus);
@@ -218,6 +263,34 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Document generation */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <h2 className="font-bold text-gray-900 mb-3">Generate Documents</h2>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => createDocument('invoice')}
+            disabled={creating !== null}
+            className="flex items-center gap-2 border border-teal-200 text-teal-700 hover:bg-teal-50 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+          >
+            {creating === 'invoice'
+              ? <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+              : <ReceiptText size={15} />}
+            Create Invoice
+          </button>
+          <button
+            onClick={() => createDocument('delivery_note')}
+            disabled={creating !== null}
+            className="flex items-center gap-2 border border-indigo-200 text-indigo-700 hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+          >
+            {creating === 'delivery_note'
+              ? <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              : <Truck size={15} />}
+            Create Delivery Note
+          </button>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">Creates a new document pre-filled with this order&apos;s customer and items.</p>
       </div>
 
       <div className="flex gap-3">

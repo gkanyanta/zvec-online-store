@@ -9,19 +9,21 @@ import { formatPrice } from '@/lib/utils';
 import type { BizDocument, DocumentStatus } from '@/types';
 
 const STATUS_COLOR: Record<DocumentStatus, string> = {
-  draft:     'bg-gray-100 text-gray-600',
-  sent:      'bg-blue-100 text-blue-700',
-  accepted:  'bg-teal-100 text-teal-700',
-  rejected:  'bg-red-100 text-red-600',
-  expired:   'bg-orange-100 text-orange-600',
-  paid:      'bg-emerald-100 text-emerald-700',
-  overdue:   'bg-red-100 text-red-700',
-  cancelled: 'bg-gray-100 text-gray-500',
-  issued:    'bg-emerald-100 text-emerald-700',
+  draft:      'bg-gray-100 text-gray-600',
+  sent:       'bg-blue-100 text-blue-700',
+  accepted:   'bg-teal-100 text-teal-700',
+  rejected:   'bg-red-100 text-red-600',
+  expired:    'bg-orange-100 text-orange-600',
+  paid:       'bg-emerald-100 text-emerald-700',
+  overdue:    'bg-red-100 text-red-700',
+  cancelled:  'bg-gray-100 text-gray-500',
+  issued:     'bg-emerald-100 text-emerald-700',
+  dispatched: 'bg-indigo-100 text-indigo-700',
 };
 
 const QUOTE_STATUSES: DocumentStatus[] = ['draft', 'sent', 'accepted', 'rejected', 'expired'];
 const INVOICE_STATUSES: DocumentStatus[] = ['draft', 'sent', 'paid', 'overdue', 'cancelled'];
+const DELIVERY_NOTE_STATUSES: DocumentStatus[] = ['draft', 'dispatched'];
 
 function formatDate(d?: string) {
   if (!d) return '—';
@@ -50,7 +52,13 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
     </div>
   );
 
-  const statuses = doc.type === 'quote' ? QUOTE_STATUSES : doc.type === 'invoice' ? INVOICE_STATUSES : [];
+  const statuses = doc.type === 'quote'
+    ? QUOTE_STATUSES
+    : doc.type === 'invoice'
+    ? INVOICE_STATUSES
+    : doc.type === 'delivery_note'
+    ? DELIVERY_NOTE_STATUSES
+    : [];
 
   async function setStatus(status: DocumentStatus) {
     await updateDocument(id, { status });
@@ -69,7 +77,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
     }
   }
 
-  const typeLabel = doc.type.charAt(0).toUpperCase() + doc.type.slice(1);
+  const typeLabel = doc.type === 'delivery_note' ? 'Delivery Note' : doc.type.charAt(0).toUpperCase() + doc.type.slice(1);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -119,7 +127,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
         <div className="lg:col-span-2 space-y-4">
           {/* Customer */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 className="font-bold text-gray-900 mb-3">Bill To</h2>
+            <h2 className="font-bold text-gray-900 mb-3">{doc.type === 'delivery_note' ? 'Deliver To' : 'Bill To'}</h2>
             <p className="font-semibold text-gray-900">{doc.customer.name}</p>
             {doc.customer.phone && <p className="text-sm text-gray-600">{doc.customer.phone}</p>}
             {doc.customer.email && <p className="text-sm text-gray-600">{doc.customer.email}</p>}

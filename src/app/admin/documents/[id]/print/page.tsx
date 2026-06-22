@@ -20,7 +20,11 @@ export default function DocumentPrintPage({ params }: { params: Promise<{ id: st
 
   if (!doc) return <div className="p-8 text-gray-400">Loading document…</div>;
 
-  const typeLabel = doc.type === 'quote' ? 'QUOTATION' : doc.type === 'invoice' ? 'INVOICE' : 'RECEIPT';
+  const isDeliveryNote = doc.type === 'delivery_note';
+  const typeLabel = doc.type === 'quote' ? 'QUOTATION'
+    : doc.type === 'invoice' ? 'INVOICE'
+    : doc.type === 'receipt' ? 'RECEIPT'
+    : 'DELIVERY NOTE';
   const today = new Date().toLocaleDateString('en-ZM', { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
@@ -82,9 +86,11 @@ export default function DocumentPrintPage({ params }: { params: Promise<{ id: st
         {/* Divider */}
         <div style={{ height: 3, background: '#0D9E8E', borderRadius: 2, marginBottom: 24 }} />
 
-        {/* Bill to */}
+        {/* Deliver To / Bill To */}
         <div className="mb-8">
-          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#0D9E8E' }}>Bill To</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#0D9E8E' }}>
+            {isDeliveryNote ? 'Deliver To' : 'Bill To'}
+          </p>
           <p className="font-bold text-lg">{doc.customer.name}</p>
           {doc.customer.phone && <p className="text-sm text-gray-600">{doc.customer.phone}</p>}
           {doc.customer.email && <p className="text-sm text-gray-600">{doc.customer.email}</p>}
@@ -97,8 +103,9 @@ export default function DocumentPrintPage({ params }: { params: Promise<{ id: st
             <tr style={{ background: '#0D9E8E', color: 'white' }}>
               <th className="text-left py-3 px-4 text-xs font-bold uppercase tracking-wide">Description</th>
               <th className="text-center py-3 px-3 text-xs font-bold uppercase tracking-wide">Qty</th>
-              <th className="text-right py-3 px-3 text-xs font-bold uppercase tracking-wide">Unit Price</th>
-              <th className="text-right py-3 px-4 text-xs font-bold uppercase tracking-wide">Total</th>
+              {!isDeliveryNote && <th className="text-right py-3 px-3 text-xs font-bold uppercase tracking-wide">Unit Price</th>}
+              {!isDeliveryNote && <th className="text-right py-3 px-4 text-xs font-bold uppercase tracking-wide">Total</th>}
+              {isDeliveryNote && <th className="text-center py-3 px-4 text-xs font-bold uppercase tracking-wide">Received</th>}
             </tr>
           </thead>
           <tbody>
@@ -106,32 +113,59 @@ export default function DocumentPrintPage({ params }: { params: Promise<{ id: st
               <tr key={idx} style={{ background: idx % 2 === 0 ? '#f0fdfa' : 'white' }}>
                 <td className="py-3 px-4 text-sm">{item.description}</td>
                 <td className="py-3 px-3 text-sm text-center text-gray-600">{item.quantity}</td>
-                <td className="py-3 px-3 text-sm text-right text-gray-600">{formatPrice(item.unitPrice)}</td>
-                <td className="py-3 px-4 text-sm text-right font-semibold">{formatPrice(item.total)}</td>
+                {!isDeliveryNote && <td className="py-3 px-3 text-sm text-right text-gray-600">{formatPrice(item.unitPrice)}</td>}
+                {!isDeliveryNote && <td className="py-3 px-4 text-sm text-right font-semibold">{formatPrice(item.total)}</td>}
+                {isDeliveryNote && <td className="py-3 px-4 text-sm text-center" style={{ border: '1px solid #d1d5db', minWidth: 80 }}>&nbsp;</td>}
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* Totals */}
-        <div className="ml-auto max-w-xs space-y-1.5">
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Subtotal</span><span>{formatPrice(doc.subtotal)}</span>
-          </div>
-          {doc.discount > 0 && (
+        {/* Totals (hidden for delivery notes) */}
+        {!isDeliveryNote && (
+          <div className="ml-auto max-w-xs space-y-1.5">
             <div className="flex justify-between text-sm text-gray-600">
-              <span>Discount</span><span>- {formatPrice(doc.discount)}</span>
+              <span>Subtotal</span><span>{formatPrice(doc.subtotal)}</span>
             </div>
-          )}
-          {doc.tax > 0 && (
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>Tax / VAT</span><span>{formatPrice(doc.tax)}</span>
+            {doc.discount > 0 && (
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Discount</span><span>- {formatPrice(doc.discount)}</span>
+              </div>
+            )}
+            {doc.tax > 0 && (
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Tax / VAT</span><span>{formatPrice(doc.tax)}</span>
+              </div>
+            )}
+            <div className="flex justify-between font-black text-xl pt-2" style={{ borderTop: '2px solid #0D9E8E', color: '#0D9E8E' }}>
+              <span>TOTAL</span><span>{formatPrice(doc.total)}</span>
             </div>
-          )}
-          <div className="flex justify-between font-black text-xl pt-2" style={{ borderTop: '2px solid #0D9E8E', color: '#0D9E8E' }}>
-            <span>TOTAL</span><span>{formatPrice(doc.total)}</span>
           </div>
-        </div>
+        )}
+
+        {/* Delivery note signature section */}
+        {isDeliveryNote && (
+          <div className="mt-10 grid grid-cols-2 gap-10">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-6">Dispatched By</p>
+              <div style={{ borderTop: '1px solid #9ca3af', paddingTop: 4 }}>
+                <p className="text-xs text-gray-400">Name &amp; Signature</p>
+              </div>
+              <div className="mt-4" style={{ borderTop: '1px solid #9ca3af', paddingTop: 4 }}>
+                <p className="text-xs text-gray-400">Date</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-6">Received By (Customer)</p>
+              <div style={{ borderTop: '1px solid #9ca3af', paddingTop: 4 }}>
+                <p className="text-xs text-gray-400">Name &amp; Signature</p>
+              </div>
+              <div className="mt-4" style={{ borderTop: '1px solid #9ca3af', paddingTop: 4 }}>
+                <p className="text-xs text-gray-400">Date</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Notes */}
         {doc.notes && (

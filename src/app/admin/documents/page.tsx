@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, ReceiptText, FileText, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, ReceiptText, FileText, ChevronRight, Trash2, Truck } from 'lucide-react';
 import { useDocumentsStore } from '@/store/documents';
 import { formatPrice } from '@/lib/utils';
 import type { DocumentType, DocumentStatus } from '@/types';
@@ -12,22 +12,24 @@ const TYPE_TABS: { value: DocumentType | 'all'; label: string }[] = [
   { value: 'quote', label: 'Quotations' },
   { value: 'invoice', label: 'Invoices' },
   { value: 'receipt', label: 'Receipts' },
+  { value: 'delivery_note', label: 'Delivery Notes' },
 ];
 
 const STATUS_COLOR: Record<DocumentStatus, string> = {
-  draft:     'bg-gray-100 text-gray-600',
-  sent:      'bg-blue-100 text-blue-700',
-  accepted:  'bg-teal-100 text-teal-700',
-  rejected:  'bg-red-100 text-red-600',
-  expired:   'bg-orange-100 text-orange-600',
-  paid:      'bg-emerald-100 text-emerald-700',
-  overdue:   'bg-red-100 text-red-700',
-  cancelled: 'bg-gray-100 text-gray-500',
-  issued:    'bg-emerald-100 text-emerald-700',
+  draft:      'bg-gray-100 text-gray-600',
+  sent:       'bg-blue-100 text-blue-700',
+  accepted:   'bg-teal-100 text-teal-700',
+  rejected:   'bg-red-100 text-red-600',
+  expired:    'bg-orange-100 text-orange-600',
+  paid:       'bg-emerald-100 text-emerald-700',
+  overdue:    'bg-red-100 text-red-700',
+  cancelled:  'bg-gray-100 text-gray-500',
+  issued:     'bg-emerald-100 text-emerald-700',
+  dispatched: 'bg-indigo-100 text-indigo-700',
 };
 
-const TYPE_ICON = { quote: FileText, invoice: ReceiptText, receipt: ReceiptText };
-const TYPE_COLOR = { quote: 'text-blue-500', invoice: 'text-teal-600', receipt: 'text-emerald-600' };
+const TYPE_ICON = { quote: FileText, invoice: ReceiptText, receipt: ReceiptText, delivery_note: Truck };
+const TYPE_COLOR = { quote: 'text-blue-500', invoice: 'text-teal-600', receipt: 'text-emerald-600', delivery_note: 'text-indigo-500' };
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-ZM', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -55,7 +57,7 @@ export default function DocumentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-gray-900">Documents</h1>
-          <p className="text-gray-500 text-sm">Quotations · Invoices · Receipts</p>
+          <p className="text-gray-500 text-sm">Quotations · Invoices · Receipts · Delivery Notes</p>
         </div>
         <Link
           href="/admin/documents/new"
@@ -131,7 +133,9 @@ export default function DocumentsPage() {
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <span className="text-xs text-gray-500">{formatDate(doc.createdAt)}</span>
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-gray-900 text-sm">{formatPrice(doc.total)}</td>
+                    <td className="px-4 py-3 text-right font-bold text-gray-900 text-sm">
+                      {doc.type === 'delivery_note' ? <span className="text-gray-400 text-xs">—</span> : formatPrice(doc.total)}
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`text-xs font-semibold px-2 py-1 rounded-full capitalize ${STATUS_COLOR[doc.status]}`}>
                         {doc.status}

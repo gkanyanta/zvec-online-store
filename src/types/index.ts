@@ -32,10 +32,10 @@ export interface DocumentItem {
   total: number;
 }
 
-export type DocumentType = 'quote' | 'invoice' | 'receipt';
+export type DocumentType = 'quote' | 'invoice' | 'receipt' | 'delivery_note';
 export type DocumentStatus =
   | 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'
-  | 'paid' | 'overdue' | 'cancelled' | 'issued';
+  | 'paid' | 'overdue' | 'cancelled' | 'issued' | 'dispatched';
 
 export interface BizDocument {
   id: string;
