@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Phone, MapPin, Package, Clock, Check, ReceiptText, Truck } from 'lucide-react';
 import { useOrdersStore, OrderStatus } from '@/store/orders';
+import { useAuthStore } from '@/store/auth';
 import { adminFetch } from '@/lib/adminFetch';
 import { formatPrice } from '@/lib/utils';
 import StatusBadge from '@/components/admin/StatusBadge';
@@ -30,9 +31,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const { orders, updateStatus } = useOrdersStore();
+  const { user } = useAuthStore();
   const order = orders.find((o) => o.id === id);
   if (!order) notFound();
 
+  const isDelivery = user?.role === 'delivery';
   const nextStatus = NEXT_STATUS[order.status];
   const currentStepIdx = STATUS_STEPS.indexOf(order.status);
   const [creating, setCreating] = useState<'invoice' | 'delivery_note' | null>(null);
@@ -103,7 +106,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </div>
           <p className="text-gray-500 text-sm">Placed {formatDate(order.createdAt)}</p>
         </div>
-        {order.status !== 'cancelled' && order.status !== 'delivered' && nextStatus && (
+        {order.status !== 'cancelled' && order.status !== 'delivered' && nextStatus &&
+          (!isDelivery || nextStatus === 'shipped' || nextStatus === 'delivered') && (
           <button
             onClick={() => changeStatus(nextStatus)}
             className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl transition-colors text-sm"
@@ -187,7 +191,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="bg-white rounded-2xl border border-gray-100 p-5">
             <h2 className="font-bold text-gray-900 mb-3">Update Status</h2>
             <div className="flex flex-wrap gap-2">
-              {(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as OrderStatus[]).map((s) => (
+              {(isDelivery
+                ? (['shipped', 'delivered'] as OrderStatus[])
+                : (['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as OrderStatus[])
+              ).map((s) => (
                 <button
                   key={s}
                   onClick={() => changeStatus(s)}
@@ -265,8 +272,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Document generation */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5">
+      {/* Document generation — owner/sales only */}
+      {!isDelivery && <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <h2 className="font-bold text-gray-900 mb-3">Generate Documents</h2>
         <div className="flex flex-wrap gap-3">
           <button
@@ -291,7 +298,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </button>
         </div>
         <p className="text-xs text-gray-400 mt-2">Creates a new document pre-filled with this order&apos;s customer and items.</p>
-      </div>
+      </div>}
 
       <div className="flex gap-3">
         <Link href="/admin/orders" className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm">

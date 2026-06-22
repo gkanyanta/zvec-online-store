@@ -1,42 +1,50 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingBag, Package, Users,
   LogOut, ExternalLink, ChevronRight, X, Gift,
-  ReceiptText, TrendingUp, Wallet,
+  ReceiptText, TrendingUp, Wallet, UserCog,
 } from 'lucide-react';
-import { useEffect } from 'react';
-import { useAdminStore } from '@/store/admin';
+import { useAuthStore, type UserRole } from '@/store/auth';
 import { useOrdersStore } from '@/store/orders';
 
-const navItems = [
-  { href: '/admin',           label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/orders',    label: 'Orders',    icon: ShoppingBag },
-  { href: '/admin/products',  label: 'Products',  icon: Package },
-  { href: '/admin/packages',  label: 'Packages',  icon: Gift },
-  { href: '/admin/documents', label: 'Documents', icon: ReceiptText },
-  { href: '/admin/expenses',  label: 'Expenses',  icon: Wallet },
-  { href: '/admin/reports',   label: 'Reports',   icon: TrendingUp },
-  { href: '/admin/customers', label: 'Customers', icon: Users },
+const NAV = [
+  { href: '/admin',           label: 'Dashboard', icon: LayoutDashboard, exact: true, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/orders',    label: 'Orders',    icon: ShoppingBag,     exact: false, roles: ['owner', 'sales', 'delivery'] as UserRole[] },
+  { href: '/admin/products',  label: 'Products',  icon: Package,         exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/packages',  label: 'Packages',  icon: Gift,            exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/documents', label: 'Documents', icon: ReceiptText,     exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/expenses',  label: 'Expenses',  icon: Wallet,          exact: false, roles: ['owner'] as UserRole[] },
+  { href: '/admin/reports',   label: 'Reports',   icon: TrendingUp,      exact: false, roles: ['owner'] as UserRole[] },
+  { href: '/admin/customers', label: 'Customers', icon: Users,           exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/users',     label: 'Users',     icon: UserCog,         exact: false, roles: ['owner'] as UserRole[] },
 ];
 
-interface Props {
-  onClose?: () => void;
-}
+const ROLE_BADGE: Record<UserRole, string> = {
+  owner:    'bg-teal-500 text-white',
+  sales:    'bg-blue-500 text-white',
+  delivery: 'bg-indigo-500 text-white',
+};
+
+interface Props { onClose?: () => void; }
 
 export default function AdminSidebar({ onClose }: Props) {
   const pathname = usePathname();
   const router = useRouter();
-  const logout = useAdminStore((s) => s.logout);
+  const { user, logout } = useAuthStore();
   const orders = useOrdersStore((s) => s.orders);
   const fetchOrders = useOrdersStore((s) => s.fetchOrders);
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
-  function isActive(item: typeof navItems[0]) {
+  const role = user?.role ?? 'sales';
+  const visibleNav = NAV.filter((item) => item.roles.includes(role));
+
+  function isActive(item: typeof NAV[0]) {
     return item.exact ? pathname === item.href : pathname.startsWith(item.href);
   }
 
@@ -52,9 +60,7 @@ export default function AdminSidebar({ onClose }: Props) {
         <div className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/zvec-logo.png" alt="ZVEC" className="h-8 object-contain brightness-0 invert" />
-          <div>
-            <div className="text-gray-400 text-xs mt-0.5">Admin Panel</div>
-          </div>
+          <span className="text-gray-400 text-xs">Admin</span>
         </div>
         {onClose && (
           <button onClick={onClose} className="text-gray-400 hover:text-white lg:hidden">
@@ -63,9 +69,24 @@ export default function AdminSidebar({ onClose }: Props) {
         )}
       </div>
 
+      {/* Current user */}
+      {user && (
+        <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-xs font-black shrink-0">
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+            <span className={`text-xs font-bold px-1.5 py-0.5 rounded capitalize ${ROLE_BADGE[user.role]}`}>
+              {user.role}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Nav */}
-      <nav className="flex-1 p-4 space-y-1">
-        {navItems.map((item) => {
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {visibleNav.map((item) => {
           const active = isActive(item);
           return (
             <Link
@@ -73,9 +94,7 @@ export default function AdminSidebar({ onClose }: Props) {
               href={item.href}
               onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors group ${
-                active
-                  ? 'bg-teal-500 text-white'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                active ? 'bg-teal-500 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}
             >
               <item.icon size={18} />

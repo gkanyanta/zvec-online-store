@@ -112,6 +112,17 @@ export interface Order {
   updatedAt: string;
 }
 
+export type UserRole = 'owner' | 'sales' | 'delivery';
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  username: string;
+  role: UserRole;
+  active: boolean;
+  createdAt: string;
+}
+
 export interface CustomerInfo {
   firstName: string;
   lastName: string;

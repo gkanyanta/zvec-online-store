@@ -1,6 +1,7 @@
+import crypto from 'crypto';
 import { neon } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
-import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod } from '@/types';
+import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole } from '@/types';
 
 export const sql = neon(process.env.DATABASE_URL!);
 
@@ -55,6 +56,17 @@ export function toDocument(row: Record<string, unknown>): BizDocument {
     linkedDocId: row.linked_doc_id ? (row.linked_doc_id as string) : undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+  };
+}
+
+export function toUser(row: Record<string, unknown>): AdminUser {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    username: row.username as string,
+    role: row.role as UserRole,
+    active: row.active as boolean,
+    createdAt: row.created_at as string,
   };
 }
 
@@ -157,6 +169,32 @@ export async function ensureSchema(): Promise<void> {
     VALUES ('quote', 0), ('invoice', 0), ('receipt', 0), ('delivery_note', 0)
     ON CONFLICT DO NOTHING
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id         TEXT        PRIMARY KEY,
+      name       TEXT        NOT NULL,
+      username   TEXT        NOT NULL UNIQUE,
+      password   TEXT        NOT NULL,
+      role       TEXT        NOT NULL DEFAULT 'sales',
+      active     BOOLEAN     NOT NULL DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Seed default owner if no users exist yet
+  const [{ count }] = await sql`SELECT COUNT(*)::int AS count FROM users`;
+  if (count === 0) {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = await new Promise<string>((res, rej) =>
+      crypto.scrypt('Admin1234', salt, 64, (err, key) => err ? rej(err) : res(key.toString('hex')))
+    );
+    const defaultId = crypto.randomBytes(6).toString('hex');
+    await sql`
+      INSERT INTO users (id, name, username, password, role)
+      VALUES (${defaultId}, 'ZVEC Owner', 'admin', ${salt + ':' + hash}, 'owner')
+    `;
+  }
 
   for (const p of seedProducts) {
     await sql`
