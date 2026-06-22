@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ShoppingCart, Search, Menu, X, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { useCartStore } from '@/store/cart';
+import { ZVEC_PHONE_DISPLAY, ZVEC_WHATSAPP_URL } from '@/lib/data';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,10 +26,11 @@ export default function Header() {
     <>
       {/* Top bar — navy from logo */}
       <div className="bg-[#1e3a8a] text-white text-sm py-2 px-4 flex items-center justify-between">
-        <span className="hidden sm:flex items-center gap-2">
+        <a href={ZVEC_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
+           className="hidden sm:flex items-center gap-2 hover:text-teal-300 transition-colors">
           <Phone size={14} />
-          <span>+260 97X XXX XXX &nbsp;|&nbsp; Cash on Delivery Available Nationwide</span>
-        </span>
+          <span>{ZVEC_PHONE_DISPLAY} &nbsp;|&nbsp; Cash on Delivery Available Nationwide</span>
+        </a>
         <span className="text-teal-300 text-xs sm:text-sm font-medium">
           🛡️ Trusted Zambian Store &nbsp;•&nbsp; Genuine Products Guaranteed
         </span>
@@ -105,10 +107,11 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-2 border-t border-gray-100 text-sm text-gray-500 flex items-center gap-2">
+            <a href={ZVEC_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
+               className="pt-2 border-t border-gray-100 text-sm text-gray-500 flex items-center gap-2 hover:text-teal-600">
               <Phone size={14} />
-              +260 97X XXX XXX
-            </div>
+              {ZVEC_PHONE_DISPLAY}
+            </a>
           </div>
         )}
       </header>

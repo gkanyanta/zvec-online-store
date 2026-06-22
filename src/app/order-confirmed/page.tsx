@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { CheckCircle, Phone, MessageCircle, Package } from 'lucide-react';
+import { ZVEC_PHONE, ZVEC_WHATSAPP_URL } from '@/lib/data';
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -64,7 +65,7 @@ function OrderConfirmedContent() {
         {/* Contact options */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           <a
-            href="https://wa.me/260970000000"
+            href={ZVEC_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-medium py-3 rounded-xl transition-colors text-sm"
@@ -72,7 +73,7 @@ function OrderConfirmedContent() {
             <MessageCircle size={16} /> WhatsApp Us
           </a>
           <a
-            href="tel:+260970000000"
+            href={`tel:${ZVEC_PHONE}`}
             className="flex items-center justify-center gap-2 border-2 border-teal-500 text-teal-700 font-medium py-3 rounded-xl hover:bg-teal-50 transition-colors text-sm"
           >
             <Phone size={16} /> Call Us

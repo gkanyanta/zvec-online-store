@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, Mail, MapPin } from 'lucide-react';
+import { ZVEC_PHONE, ZVEC_PHONE_DISPLAY, ZVEC_WHATSAPP_URL } from '@/lib/data';
 
 export default function Footer() {
   return (
@@ -75,7 +76,13 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
                 <Phone size={16} className="text-teal-400 mt-0.5 shrink-0" />
-                <span>+260 97X XXX XXX<br />Mon–Sat: 8am – 6pm</span>
+                <div>
+                  <a href={`tel:${ZVEC_PHONE}`} className="hover:text-teal-400 transition-colors">{ZVEC_PHONE_DISPLAY}</a>
+                  <br />
+                  <a href={ZVEC_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-colors text-xs">WhatsApp us</a>
+                  <br />
+                  <span className="text-xs text-gray-500">Mon–Sat: 8am – 6pm</span>
+                </div>
               </li>
               <li className="flex items-start gap-2">
                 <Mail size={16} className="text-teal-400 mt-0.5 shrink-0" />

@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { ZVEC_PHONE, ZVEC_PHONE_DISPLAY, ZVEC_WHATSAPP_URL } from '@/lib/data';
 import {
   Search, Package, CheckCircle, Clock, Truck, MapPin,
   Phone, MessageCircle, ChevronRight, XCircle, AlertCircle,
@@ -211,7 +212,7 @@ function OrderTracker({ order }: { order: Order }) {
         <p className="text-blue-200 text-sm mb-4">Our team is available Mon–Sat, 8am–6pm.</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a
-            href="https://wa.me/260970000000"
+            href={ZVEC_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-400 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm"
@@ -219,10 +220,10 @@ function OrderTracker({ order }: { order: Order }) {
             <MessageCircle size={16} /> WhatsApp Us
           </a>
           <a
-            href="tel:+260970000000"
+            href={`tel:${ZVEC_PHONE}`}
             className="flex items-center justify-center gap-2 border border-white/30 hover:bg-white/10 text-white font-medium px-5 py-2.5 rounded-xl transition-colors text-sm"
           >
-            <Phone size={16} /> +260 97X XXX XXX
+            <Phone size={16} /> {ZVEC_PHONE_DISPLAY}
           </a>
         </div>
       </div>
@@ -328,7 +329,7 @@ function TrackOrderContent() {
             <p>• Check your SMS for the reference number</p>
           </div>
           <a
-            href="https://wa.me/260970000000"
+            href={ZVEC_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 mt-4 text-teal-600 hover:text-teal-700 text-sm font-medium"

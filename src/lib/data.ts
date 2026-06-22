@@ -1,5 +1,9 @@
 import { Product, Package } from '@/types';
 
+export const ZVEC_PHONE        = '+260973804982';
+export const ZVEC_PHONE_DISPLAY = '+260 973 804 982';
+export const ZVEC_WHATSAPP_URL  = 'https://wa.me/260973804982';
+
 export const categories = [
   { id: 'all', name: 'All Products', icon: '🛒' },
   { id: 'refrigerators', name: 'Refrigerators & Freezers', icon: '🧊' },

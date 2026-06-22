@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { Check, ArrowRight, ShoppingCart } from 'lucide-react';
+import { ZVEC_WHATSAPP_URL } from '@/lib/data';
 import { usePackagesStore } from '@/store/packages';
 import { useInventoryStore } from '@/store/inventory';
 import { useCartStore } from '@/store/cart';
@@ -141,7 +142,7 @@ export default function PackagesPage() {
             Contact us and our team will help you build the perfect bundle for your budget and needs.
           </p>
           <a
-            href="https://wa.me/260970000000"
+            href={ZVEC_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-white text-teal-700 font-bold px-8 py-3 rounded-xl hover:bg-teal-50 transition-colors"

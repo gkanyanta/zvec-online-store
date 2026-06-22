@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Shield, Truck, CreditCard, RotateCcw, Star, ChevronRight } from 'lucide-react';
+import { ZVEC_WHATSAPP_URL } from '@/lib/data';
 import { packages, categories } from '@/lib/data';
 import { sql, toProduct, ensureSchema } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
@@ -251,7 +252,7 @@ export default async function HomePage() {
           <h2 className="text-2xl font-black text-white mb-2">Need Help Ordering?</h2>
           <p className="text-teal-100 mb-6">Chat with us on WhatsApp. We&apos;re available Mon–Sat, 8am–6pm.</p>
           <a
-            href="https://wa.me/260970000000"
+            href={ZVEC_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-white text-teal-700 font-bold px-8 py-3 rounded-xl hover:bg-teal-50 transition-colors"
