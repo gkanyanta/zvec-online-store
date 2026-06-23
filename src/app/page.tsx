@@ -31,7 +31,7 @@ export default async function HomePage() {
 
   const [featuredRows, moreRows] = await Promise.all([
     sql`SELECT * FROM products WHERE badge IS NOT NULL ORDER BY name LIMIT 8`,
-    sql`SELECT * FROM products ORDER BY created_at DESC LIMIT 8`,
+    sql`SELECT * FROM products ORDER BY id DESC LIMIT 8`,
   ]);
   const featuredProducts = featuredRows.map(toProduct);
   const moreProducts    = moreRows.map(toProduct);
