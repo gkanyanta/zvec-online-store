@@ -62,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button
           onClick={() => addItem(product)}
           disabled={!product.inStock}
-          className="w-full flex items-center justify-center gap-2 bg-teal-500 hover:bg-teal-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium text-sm py-2 rounded-lg transition-colors"
+          className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:bg-gray-100 disabled:text-gray-400 active:scale-95 text-gray-950 font-bold text-sm py-2 rounded-lg transition-all"
         >
           <ShoppingCart size={15} />
           Add to Cart
