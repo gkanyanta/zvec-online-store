@@ -11,22 +11,37 @@ interface ImageUploadProps {
   quality?: number;
 }
 
+const MAX_OUTPUT_BYTES = 3_200_000; // ~3.2 MB data URL keeps JSON body well under Vercel's 4.5 MB limit
+
 async function compressImage(file: File, maxSizePx = 900, quality = 0.82): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        if (width > maxSizePx || height > maxSizePx) {
-          if (width > height) { height = Math.round((height / width) * maxSizePx); width = maxSizePx; }
-          else { width = Math.round((width / height) * maxSizePx); height = maxSizePx; }
+        try {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          if (width > maxSizePx || height > maxSizePx) {
+            if (width > height) { height = Math.round((height / width) * maxSizePx); width = maxSizePx; }
+            else { width = Math.round((width / height) * maxSizePx); height = maxSizePx; }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { reject(new Error('Canvas not supported')); return; }
+          ctx.drawImage(img, 0, 0, width, height);
+          // Reduce quality iteratively until output fits within limit
+          let q = quality;
+          let result = canvas.toDataURL('image/jpeg', q);
+          while (result.length > MAX_OUTPUT_BYTES && q > 0.35) {
+            q = Math.max(0.35, q - 0.1);
+            result = canvas.toDataURL('image/jpeg', q);
+          }
+          resolve(result);
+        } catch (err) {
+          reject(err);
         }
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.onerror = reject;
       img.src = e.target!.result as string;
