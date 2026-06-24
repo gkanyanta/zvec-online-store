@@ -7,6 +7,8 @@ interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  maxSizePx?: number;
+  quality?: number;
 }
 
 async function compressImage(file: File, maxSizePx = 900, quality = 0.82): Promise<string> {
@@ -34,7 +36,7 @@ async function compressImage(file: File, maxSizePx = 900, quality = 0.82): Promi
   });
 }
 
-export default function ImageUpload({ value, onChange, label = 'Product Image' }: ImageUploadProps) {
+export default function ImageUpload({ value, onChange, label = 'Product Image', maxSizePx = 900, quality = 0.82 }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,7 +47,7 @@ export default function ImageUpload({ value, onChange, label = 'Product Image' }
     setError('');
     setLoading(true);
     try {
-      const compressed = await compressImage(file);
+      const compressed = await compressImage(file, maxSizePx, quality);
       onChange(compressed);
     } catch {
       setError('Failed to process image. Please try another file.');

@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ShoppingCart, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import type { Product } from '@/types';
-import { formatPrice } from '@/lib/utils';
-
 interface Slide {
-  product: Product;
+  id: string;
+  image: string;
+  title: string;
   tagline: string;
+  linkUrl: string;
+  badge?: string;
 }
 
 export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
@@ -45,6 +46,9 @@ export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
 
   if (!slides.length) return null;
   const slide = slides[current];
+  const displayTitle  = slide.title;
+  const displayBadge  = slide.badge ?? '';
+  const displayLink   = slide.linkUrl;
 
   return (
     <section className="relative h-[88vh] min-h-[560px] max-h-[860px] overflow-hidden bg-gray-950">
@@ -52,13 +56,13 @@ export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
       {/* Background slides — cross-fade */}
       {slides.map((s, i) => (
         <div
-          key={s.product.id}
+          key={s.id}
           className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${i === current ? 'opacity-100' : 'opacity-0'}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={s.product.image}
-            alt={s.product.name}
+            src={s.image}
+            alt={s.title}
             className="w-full h-full object-cover scale-105"
           />
           {/* Gradient overlay: heavy on left so text is readable, lighter on right */}
@@ -72,49 +76,42 @@ export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full">
           <div className="max-w-xl">
 
-            {/* Category tag */}
-            <div
-              className={`inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-widest transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
-              style={{ transitionDelay: '0ms' }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              {slide.product.badge ?? slide.product.category}
-            </div>
+            {/* Badge / category tag */}
+            {displayBadge && (
+              <div
+                className={`inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-widest transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
+                style={{ transitionDelay: '0ms' }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                {displayBadge}
+              </div>
+            )}
 
-            {/* Product name */}
+            {/* Title */}
             <h1
               className={`text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-5 transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
               style={{ transitionDelay: '60ms' }}
             >
-              {slide.product.name}
+              {displayTitle}
             </h1>
 
             {/* Tagline */}
-            <p
-              className={`text-gray-300 text-lg mb-8 leading-relaxed transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-              style={{ transitionDelay: '110ms' }}
-            >
-              {slide.tagline}
-            </p>
-
-            {/* Price */}
-            <div
-              className={`flex items-baseline gap-4 mb-10 transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-              style={{ transitionDelay: '160ms' }}
-            >
-              <span className="text-4xl font-black text-amber-400">{formatPrice(slide.product.price)}</span>
-              {slide.product.originalPrice && slide.product.originalPrice > slide.product.price && (
-                <span className="text-gray-500 text-xl line-through">{formatPrice(slide.product.originalPrice)}</span>
-              )}
-            </div>
+            {slide.tagline && (
+              <p
+                className={`text-gray-300 text-lg mb-10 leading-relaxed transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+                style={{ transitionDelay: '110ms' }}
+              >
+                {slide.tagline}
+              </p>
+            )}
 
             {/* CTAs */}
             <div
               className={`flex flex-wrap gap-4 transition-all duration-400 ${textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-              style={{ transitionDelay: '210ms' }}
+              style={{ transitionDelay: '160ms' }}
             >
               <Link
-                href={`/products/${slide.product.slug}`}
+                href={displayLink}
                 className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-gray-950 font-bold px-7 py-3.5 rounded-xl transition-all duration-200 text-sm tracking-wide shadow-lg shadow-amber-500/25"
               >
                 <ShoppingCart size={17} />

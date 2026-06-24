@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { neon, neonConfig } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
-import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus } from '@/types';
+import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus, SlideshowBanner } from '@/types';
 
 // WSL2 fix: undici (Node's built-in fetch) tries IPv6 first but it's unroutable in WSL2,
 // causing ETIMEDOUT. Override with an https-module fetch that resolves to IPv4 directly.
@@ -129,6 +129,19 @@ export function toOrder(row: Record<string, unknown>): Order {
     deliveryDate: row.delivery_date ? toISODate(row.delivery_date) : undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+  };
+}
+
+export function toBanner(row: Record<string, unknown>): SlideshowBanner {
+  return {
+    id:        row.id as string,
+    image:     row.image as string,
+    title:     row.title as string,
+    tagline:   row.tagline as string,
+    linkUrl:   row.link_url as string,
+    sortOrder: Number(row.sort_order),
+    active:    Boolean(row.active),
+    createdAt: row.created_at as string,
   };
 }
 
@@ -293,6 +306,19 @@ export async function ensureSchema(): Promise<void> {
       ON CONFLICT (id) DO NOTHING
     `;
   }
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS slideshow_banners (
+      id         TEXT    PRIMARY KEY,
+      image      TEXT    NOT NULL,
+      title      TEXT    NOT NULL DEFAULT '',
+      tagline    TEXT    NOT NULL DEFAULT '',
+      link_url   TEXT    NOT NULL DEFAULT '/products',
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      active     BOOLEAN NOT NULL DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
 
   ready = true;
 }

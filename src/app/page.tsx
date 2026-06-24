@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { ArrowRight, Shield, Truck, CreditCard, RotateCcw, ChevronRight, MessageCircleMore } from 'lucide-react';
 import { ZVEC_WHATSAPP_URL } from '@/lib/data';
 import { packages, categories } from '@/lib/data';
-import { sql, toProduct, ensureSchema } from '@/lib/db';
+import { sql, toProduct, toBanner, ensureSchema } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
@@ -29,19 +29,34 @@ const packageAccentMap: Record<string, { ring: string; badge: string; dot: strin
 export default async function HomePage() {
   await ensureSchema();
 
-  const [featuredRows, moreRows] = await Promise.all([
+  const [featuredRows, moreRows, bannerRows] = await Promise.all([
     sql`SELECT * FROM products WHERE badge IS NOT NULL ORDER BY name LIMIT 8`,
     sql`SELECT * FROM products ORDER BY id DESC LIMIT 8`,
+    sql`SELECT * FROM slideshow_banners WHERE active = true ORDER BY sort_order ASC LIMIT 3`,
   ]);
   const featuredProducts = featuredRows.map(toProduct);
   const moreProducts    = moreRows.map(toProduct);
 
-  // Pick 3 for the hero slideshow (fall back to any products if fewer featured)
-  const allRows = featuredProducts.length >= 3 ? featuredProducts : [...featuredProducts, ...moreProducts];
-  const heroSlides = allRows.slice(0, 3).map((p) => ({
-    product: p,
-    tagline: SLIDE_TAGLINES[p.id] ?? p.description.split('.')[0] + '.',
-  }));
+  // Use admin-managed banners if any exist, otherwise fall back to featured products
+  const heroSlides = bannerRows.length > 0
+    ? bannerRows.map(toBanner).map((b) => ({
+        id:      b.id,
+        image:   b.image,
+        title:   b.title,
+        tagline: b.tagline,
+        linkUrl: b.linkUrl,
+      }))
+    : (() => {
+        const pool = featuredProducts.length >= 3 ? featuredProducts : [...featuredProducts, ...moreProducts];
+        return pool.slice(0, 3).map((p) => ({
+          id:      p.id,
+          image:   p.image,
+          title:   p.name,
+          tagline: SLIDE_TAGLINES[p.id] ?? p.description.split('.')[0] + '.',
+          linkUrl: `/products/${p.slug}`,
+          badge:   p.badge ?? p.category,
+        }));
+      })();
 
   return (
     <div className="bg-gray-50">

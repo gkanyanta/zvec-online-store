@@ -129,6 +129,17 @@ export interface DeliveryRun {
   updatedAt: string;
 }
 
+export interface SlideshowBanner {
+  id: string;
+  image: string;
+  title: string;
+  tagline: string;
+  linkUrl: string;
+  sortOrder: number;
+  active: boolean;
+  createdAt: string;
+}
+
 export type UserRole = 'owner' | 'sales' | 'delivery';
 
 export interface AdminUser {
