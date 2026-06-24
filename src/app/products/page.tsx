@@ -14,12 +14,16 @@ function ProductsContent() {
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
+  const qParam = searchParams.get('q') ?? '';
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(qParam);
   const [sortBy, setSortBy] = useState('default');
   const [maxPrice, setMaxPrice] = useState(20000);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Sync search when navigating from the header search overlay
+  useEffect(() => { setSearchQuery(qParam); }, [qParam]);
 
   const filtered = useMemo(() => {
     let result = [...products];

@@ -2,15 +2,58 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Search, Menu, X, Phone } from 'lucide-react';
-import { useState } from 'react';
+import { ShoppingCart, Search, Menu, X, Phone, ChevronRight } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cart';
+import { useInventoryStore } from '@/store/inventory';
+import { formatPrice } from '@/lib/utils';
 import { ZVEC_PHONE_DISPLAY, ZVEC_WHATSAPP_URL } from '@/lib/data';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { itemCount, openCart } = useCartStore();
   const count = itemCount();
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const products = useInventoryStore((s) => s.products);
+  const fetchProducts = useInventoryStore((s) => s.fetchProducts);
+
+  useEffect(() => {
+    if (searchOpen) {
+      fetchProducts();
+      setTimeout(() => inputRef.current?.focus(), 50);
+    } else {
+      setSearchQuery('');
+    }
+  }, [searchOpen, fetchProducts]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setSearchOpen(false);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return products
+      .filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
+      .slice(0, 6);
+  }, [searchQuery, products]);
+
+  function submitSearch(e?: React.FormEvent) {
+    e?.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    router.push(`/products?q=${encodeURIComponent(q)}`);
+    setSearchOpen(false);
+  }
 
   const navLinks = [
     { href: '/products', label: 'Shop' },
@@ -72,12 +115,13 @@ export default function Header() {
 
             {/* Right actions */}
             <div className="flex items-center gap-2">
-              <Link
-                href="/products"
-                className="hidden sm:flex items-center justify-center w-9 h-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+              <button
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search"
+                className="flex items-center justify-center w-9 h-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
               >
                 <Search size={18} />
-              </Link>
+              </button>
 
               <button
                 onClick={openCart}
@@ -127,6 +171,78 @@ export default function Header() {
           </div>
         )}
       </header>
+
+      {/* Search overlay */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-sm"
+          onClick={() => setSearchOpen(false)}
+        >
+          <div
+            className="max-w-2xl mx-auto mt-16 px-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Input */}
+            <form onSubmit={submitSearch} className="relative">
+              <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products…"
+                className="w-full bg-gray-900 text-white pl-12 pr-14 py-4 rounded-2xl text-base border border-white/10 focus:outline-none focus:border-amber-500/60 placeholder-gray-500 shadow-2xl"
+              />
+              <button
+                type="button"
+                onClick={() => setSearchOpen(false)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </form>
+
+            {/* Live results */}
+            {searchQuery.trim() && (
+              <div className="bg-gray-900 border border-white/10 rounded-2xl mt-2 overflow-hidden shadow-2xl">
+                {searchResults.length > 0 ? (
+                  <>
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/products/${product.slug}`}
+                        onClick={() => setSearchOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={product.image} alt={product.name} className="w-10 h-10 object-cover rounded-lg shrink-0 bg-gray-800" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white text-sm font-medium truncate">{product.name}</p>
+                          <p className="text-gray-400 text-xs">{formatPrice(product.price)}</p>
+                        </div>
+                        <ChevronRight size={14} className="text-gray-600 shrink-0" />
+                      </Link>
+                    ))}
+                    <button
+                      onClick={submitSearch}
+                      className="w-full px-4 py-3 text-amber-400 text-sm font-semibold text-left hover:bg-white/5 transition-colors"
+                    >
+                      See all results for &ldquo;{searchQuery.trim()}&rdquo; →
+                    </button>
+                  </>
+                ) : (
+                  <div className="px-4 py-6 text-center">
+                    <p className="text-gray-400 text-sm">No products found for &ldquo;{searchQuery.trim()}&rdquo;</p>
+                    <p className="text-gray-600 text-xs mt-1">Try a different keyword</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <p className="text-center text-gray-600 text-xs mt-4">Press ESC to close</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
