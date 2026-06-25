@@ -320,3 +320,16 @@ export const zambianProvinces = [
   'Southern Province',
   'Western Province',
 ];
+
+export const DELIVERY_FEES: Record<string, number> = {
+  'Lusaka Province':       0,
+  'Central Province':    100,
+  'Copperbelt Province': 150,
+  'Eastern Province':    200,
+  'Luapula Province':    200,
+  'Muchinga Province':   200,
+  'Northern Province':   200,
+  'North-Western Province': 200,
+  'Southern Province':   150,
+  'Western Province':    250,
+};

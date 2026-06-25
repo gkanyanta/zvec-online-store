@@ -8,7 +8,7 @@ import { ArrowLeft, ShoppingCart, Check, Truck, AlertCircle, Tag, X } from 'luci
 import { useCartStore } from '@/store/cart';
 import { useOrdersStore } from '@/store/orders';
 import { formatPrice } from '@/lib/utils';
-import { zambianProvinces } from '@/lib/data';
+import { zambianProvinces, DELIVERY_FEES } from '@/lib/data';
 import { CustomerInfo, PromoCode } from '@/types';
 
 function getTomorrow() {
@@ -43,7 +43,7 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<CustomerInfo>>({});
 
   const subtotal = total();
-  const deliveryFee = 0;
+  const deliveryFee = DELIVERY_FEES[form.province] ?? 0;
   const discountAmount = promoApplied
     ? promoApplied.discountType === 'percent'
       ? Math.round((subtotal * promoApplied.discountValue) / 100)
@@ -243,7 +243,10 @@ export default function CheckoutPage() {
                     ))}
                   </select>
                   <p className="text-xs text-teal-600 mt-1 flex items-center gap-1 font-medium">
-                    <Truck size={12} /> Free delivery to {form.province}
+                    <Truck size={12} />
+                    {deliveryFee === 0
+                      ? `Free delivery to ${form.province}`
+                      : `Delivery to ${form.province}: ${formatPrice(deliveryFee)}`}
                   </p>
                 </div>
                 <div>
@@ -367,7 +370,9 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Delivery</span>
-                  <span className="text-teal-600 font-semibold">FREE</span>
+                  <span className={deliveryFee === 0 ? 'text-teal-600 font-semibold' : ''}>
+                    {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
+                  </span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-sm text-green-600 font-semibold">

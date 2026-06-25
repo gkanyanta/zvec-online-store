@@ -1,11 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, Star } from 'lucide-react';
 import { Product } from '@/types';
 import { useCartStore } from '@/store/cart';
 import { useWishlistStore } from '@/store/wishlist';
+import { useRatingsStore } from '@/store/ratings';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -16,6 +18,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggle);
   const inWishlist = useWishlistStore((s) => s.has(product.id));
+  const fetchSummaries = useRatingsStore((s) => s.fetchSummaries);
+  const rating = useRatingsStore((s) => s.summaries[product.id]);
+  useEffect(() => { fetchSummaries(); }, [fetchSummaries]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
@@ -59,12 +64,19 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
         </Link>
 
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-1.5">
           <span className="text-teal-700 font-bold text-base">{formatPrice(product.price)}</span>
           {product.originalPrice && product.originalPrice > product.price && (
             <span className="text-gray-400 text-xs line-through">{formatPrice(product.originalPrice)}</span>
           )}
         </div>
+        {rating && rating.count > 0 && (
+          <div className="flex items-center gap-1 mb-2">
+            <Star size={11} className="text-amber-400 fill-amber-400" />
+            <span className="text-xs font-semibold text-gray-700">{rating.avg.toFixed(1)}</span>
+            <span className="text-xs text-gray-400">({rating.count})</span>
+          </div>
+        )}
 
         <button
           onClick={() => addItem(product)}

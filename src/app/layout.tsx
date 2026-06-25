@@ -3,6 +3,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartSidebar from '@/components/CartSidebar';
+import WhatsAppBubble from '@/components/WhatsAppBubble';
 
 export const metadata: Metadata = {
   title: 'ZVEC Online Store — Trusted Zambian Shopping',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartSidebar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <WhatsAppBubble />
       </body>
     </html>
   );

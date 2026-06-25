@@ -378,6 +378,17 @@ export async function ensureSchema(): Promise<void> {
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id)`;
 
+  await sql`
+    CREATE TABLE IF NOT EXISTS restock_requests (
+      id         TEXT        PRIMARY KEY,
+      product_id TEXT        NOT NULL,
+      contact    TEXT        NOT NULL,
+      type       TEXT        NOT NULL DEFAULT 'phone',
+      notified   BOOLEAN     NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   ready = true;
 }
 
