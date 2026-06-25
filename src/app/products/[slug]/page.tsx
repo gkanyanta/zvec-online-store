@@ -8,6 +8,7 @@ import { useInventoryStore } from '@/store/inventory';
 import { useCartStore } from '@/store/cart';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
+import ReviewsSection from '@/components/ReviewsSection';
 import { use, useState, useEffect } from 'react';
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -164,9 +165,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       </div>
 
+      {/* Reviews */}
+      <ReviewsSection productId={product.id} />
+
       {/* Related products */}
       {related.length > 0 && (
-        <section>
+        <section className="mt-12">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Related Products</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {related.map((p) => (

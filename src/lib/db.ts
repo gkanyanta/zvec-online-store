@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { neon, neonConfig } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
-import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus, SlideshowBanner, PromoCode } from '@/types';
+import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus, SlideshowBanner, PromoCode, Review } from '@/types';
 
 // WSL2 fix: undici (Node's built-in fetch) tries IPv6 first but it's unroutable in WSL2,
 // causing ETIMEDOUT. Override with an https-module fetch that resolves to IPv4 directly.
@@ -131,6 +131,17 @@ export function toOrder(row: Record<string, unknown>): Order {
     deliveryDate: row.delivery_date ? toISODate(row.delivery_date) : undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+  };
+}
+
+export function toReview(row: Record<string, unknown>): Review {
+  return {
+    id:         row.id as string,
+    productId:  row.product_id as string,
+    authorName: row.author_name as string,
+    rating:     Number(row.rating),
+    comment:    (row.comment ?? '') as string,
+    createdAt:  row.created_at as string,
   };
 }
 
@@ -352,6 +363,18 @@ export async function ensureSchema(): Promise<void> {
 
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_code TEXT`;
   await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id          TEXT        PRIMARY KEY,
+      product_id  TEXT        NOT NULL,
+      author_name TEXT        NOT NULL,
+      rating      INTEGER     NOT NULL,
+      comment     TEXT        NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id)`;
 
   ready = true;
 }
