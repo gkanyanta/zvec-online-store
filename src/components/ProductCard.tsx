@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { Product } from '@/types';
 import { useCartStore } from '@/store/cart';
+import { useWishlistStore } from '@/store/wishlist';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -13,6 +14,8 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
+  const toggleWishlist = useWishlistStore((s) => s.toggle);
+  const inWishlist = useWishlistStore((s) => s.has(product.id));
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
@@ -39,8 +42,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span className="bg-white text-gray-800 font-semibold px-3 py-1 rounded-full text-sm">Out of Stock</span>
           </div>
         )}
-        <button className="absolute top-2 right-2 bg-white/80 hover:bg-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-          <Heart size={16} className="text-gray-600" />
+        <button
+          onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+          className="absolute top-2 right-2 bg-white/90 hover:bg-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+        >
+          <Heart size={16} className={inWishlist ? 'text-red-500 fill-red-500' : 'text-gray-600'} />
         </button>
       </Link>
 

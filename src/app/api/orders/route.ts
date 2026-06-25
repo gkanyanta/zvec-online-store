@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sql, ensureSchema, toOrder } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth';
+import { sendOrderConfirmation } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,5 +47,8 @@ export async function POST(req: Request) {
     `.catch(() => null);
   }
 
-  return NextResponse.json(toOrder(row), { status: 201 });
+  const saved = toOrder(row);
+  sendOrderConfirmation(saved).catch(() => null);
+
+  return NextResponse.json(saved, { status: 201 });
 }

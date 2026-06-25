@@ -61,6 +61,7 @@ export function toProduct(row: Record<string, unknown>): Product {
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
     costPrice: row.cost_price != null ? Number(row.cost_price) : undefined,
     image: row.image as string,
+    images: Array.isArray(row.images) ? (row.images as string[]) : [],
     description: row.description as string,
     features: Array.isArray(row.features) ? (row.features as string[]) : [],
     inStock: row.in_stock as boolean,
@@ -213,6 +214,7 @@ export async function ensureSchema(): Promise<void> {
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price NUMERIC`;
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS stock_quantity INTEGER`;
   await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS low_stock_threshold INTEGER DEFAULT 5`;
+  await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}'`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS orders (

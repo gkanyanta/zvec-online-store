@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, Plus, X } from 'lucide-react';
 import { Product } from '@/types';
 import { categories } from '@/lib/data';
 import ImageUpload from './ImageUpload';
@@ -23,6 +23,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
     originalPrice: initial.originalPrice?.toString() ?? initial.price?.toString() ?? '',
     costPrice: initial.costPrice?.toString() ?? '',
     image: initial.image ?? '',
+    images: initial.images ?? [] as string[],
     description: initial.description ?? '',
     features: initial.features?.join('\n') ?? '',
     badge: initial.badge ?? '',
@@ -59,6 +60,7 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
       originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined,
       costPrice: form.costPrice ? Number(form.costPrice) : undefined,
       image: form.image,
+      images: form.images.filter(Boolean),
       description: form.description.trim(),
       features: form.features ? form.features.split('\n').map((f) => f.trim()).filter(Boolean) : undefined,
       badge: form.badge.trim() || undefined,
@@ -210,14 +212,57 @@ export default function ProductForm({ initial = {}, onSave, backHref, title, sav
           )}
         </div>
 
-        {/* Image */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
+        {/* Images */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
           <ImageUpload
-            label="Product Image *"
+            label="Main Product Image *"
             value={form.image}
             onChange={(url) => update('image', url)}
           />
           {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
+
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-gray-700">
+                Additional Images <span className="text-gray-400 font-normal">(gallery, up to 5)</span>
+              </label>
+              {form.images.length < 5 && (
+                <button
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, images: [...f.images, ''] }))}
+                  className="flex items-center gap-1.5 text-xs text-teal-600 hover:text-teal-700 font-medium"
+                >
+                  <Plus size={13} /> Add image
+                </button>
+              )}
+            </div>
+            {form.images.length === 0 && (
+              <p className="text-gray-400 text-xs">No additional images. Click &ldquo;Add image&rdquo; to add gallery photos.</p>
+            )}
+            <div className="space-y-3">
+              {form.images.map((img, i) => (
+                <div key={i} className="relative">
+                  <ImageUpload
+                    label={`Gallery Image ${i + 1}`}
+                    value={img}
+                    onChange={(url) => {
+                      const next = [...form.images];
+                      next[i] = url;
+                      setForm((f) => ({ ...f, images: next }));
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, images: f.images.filter((_, j) => j !== i) }))}
+                    className="absolute top-0 right-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    aria-label="Remove image"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Stock */}

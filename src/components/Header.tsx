@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Search, Menu, X, Phone, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, Phone, ChevronRight, Heart } from 'lucide-react';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cart';
 import { useInventoryStore } from '@/store/inventory';
+import { useWishlistStore } from '@/store/wishlist';
 import { formatPrice } from '@/lib/utils';
 import { ZVEC_PHONE_DISPLAY, ZVEC_WHATSAPP_URL } from '@/lib/data';
 
@@ -16,6 +17,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const { itemCount, openCart } = useCartStore();
   const count = itemCount();
+  const wishlistCount = useWishlistStore((s) => s.items.length);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -122,6 +124,19 @@ export default function Header() {
               >
                 <Search size={18} />
               </button>
+
+              <Link
+                href="/wishlist"
+                aria-label="Wishlist"
+                className="relative flex items-center justify-center w-9 h-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+              >
+                <Heart size={18} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
 
               <button
                 onClick={openCart}

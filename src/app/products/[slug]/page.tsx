@@ -9,7 +9,7 @@ import { useCartStore } from '@/store/cart';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 import ProductCard from '@/components/ProductCard';
 import ReviewsSection from '@/components/ReviewsSection';
-import { use, useState, useEffect } from 'react';
+import { use, useState, useEffect, useCallback } from 'react';
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -30,6 +30,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
+  const allImages = [product.image, ...(product.images ?? []).filter(Boolean)];
+  const [activeImg, setActiveImg] = useState(0);
+  const prevImg = useCallback(() => setActiveImg((i) => (i - 1 + allImages.length) % allImages.length), [allImages.length]);
+  const nextImg = useCallback(() => setActiveImg((i) => (i + 1) % allImages.length), [allImages.length]);
 
   const related = products
     .filter((p) => p.category === product.category && p.id !== product.id)
@@ -53,15 +57,15 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       </nav>
 
       <div className="grid lg:grid-cols-2 gap-10 mb-16">
-        {/* Image */}
+        {/* Image gallery */}
         <div>
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm">
-            {product.image.startsWith('data:') ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <Image src={product.image} alt={product.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" priority />
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={allImages[activeImg]}
+              alt={product.name}
+              className="w-full h-full object-cover transition-opacity duration-200"
+            />
             {product.badge && (
               <span className="absolute top-4 left-4 bg-teal-500 text-white text-sm font-bold px-3 py-1 rounded-full">
                 {product.badge}
@@ -72,7 +76,41 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 -{calculateDiscount(product.originalPrice, product.price)}% OFF
               </span>
             )}
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={prevImg}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center shadow text-gray-700 transition-all"
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={nextImg}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center shadow text-gray-700 transition-all"
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              </>
+            )}
           </div>
+          {allImages.length > 1 && (
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+              {allImages.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveImg(i)}
+                  className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
+                    i === activeImg ? 'border-teal-500' : 'border-transparent hover:border-gray-300'
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Details */}
