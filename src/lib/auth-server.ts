@@ -35,7 +35,7 @@ export async function verifyPassword(password: string, stored: string): Promise<
 
 // ── tokens ───────────────────────────────────────────────────────────────────
 
-const TTL_MS = 10 * 60 * 60 * 1000; // 10 hours
+const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export function signToken(payload: Omit<TokenPayload, 'exp'>): string {
   const data: TokenPayload = { ...payload, exp: Date.now() + TTL_MS };

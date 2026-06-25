@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Lock, Eye, EyeOff, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Lock, Eye, EyeOff, User, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 
 export default function AdminAuthGate({ children }: { children: React.ReactNode }) {
@@ -11,6 +11,13 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('session=expired')) {
+      setSessionExpired(true);
+    }
+  }, []);
 
   if (isAuthenticated) return <>{children}</>;
 
@@ -49,6 +56,13 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
           <img src="/zvec-logo.png" alt="ZVEC Online Store" className="h-10 object-contain mx-auto mb-2" />
           <p className="text-gray-500 text-sm">Sign in to access the admin panel</p>
         </div>
+
+        {sessionExpired && (
+          <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 text-sm text-amber-700">
+            <AlertTriangle size={15} className="shrink-0" />
+            Your session expired. Please sign in again.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

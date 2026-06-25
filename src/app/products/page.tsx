@@ -49,7 +49,7 @@ function ProductsContent() {
     else if (sortBy === 'name') result.sort((a, b) => a.name.localeCompare(b.name));
 
     return result;
-  }, [selectedCategory, searchQuery, maxPrice, inStockOnly, sortBy]);
+  }, [products, selectedCategory, searchQuery, maxPrice, inStockOnly, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
