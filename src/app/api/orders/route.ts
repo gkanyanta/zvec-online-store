@@ -15,17 +15,24 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   await ensureSchema();
   const order = await req.json();
-  const { id, customer, items, subtotal, deliveryFee, total, paymentMethod, status, deliveryDate, createdAt, updatedAt } = order;
+  const { id, customer, items, subtotal, deliveryFee, discountCode, discountAmount, total, paymentMethod, status, deliveryDate, createdAt, updatedAt } = order;
 
   const [row] = await sql`
     INSERT INTO orders
-      (id, customer, items, subtotal, delivery_fee, total, payment_method, status, delivery_date, created_at, updated_at)
+      (id, customer, items, subtotal, delivery_fee, discount_code, discount_amount, total, payment_method, status, delivery_date, created_at, updated_at)
     VALUES
       (${id}, ${JSON.stringify(customer)}, ${JSON.stringify(items)},
-       ${subtotal}, ${deliveryFee}, ${total}, ${paymentMethod ?? 'cod'},
+       ${subtotal}, ${deliveryFee}, ${discountCode ?? null}, ${discountAmount ?? 0}, ${total}, ${paymentMethod ?? 'cod'},
        ${status ?? 'pending'}, ${deliveryDate ?? null}, ${createdAt}, ${updatedAt})
     RETURNING *
   `;
+
+  // Increment promo code usage count if a code was applied
+  if (discountCode) {
+    await sql`
+      UPDATE promo_codes SET uses_count = uses_count + 1 WHERE code = ${discountCode}
+    `.catch(() => null);
+  }
 
   // Deduct stock server-side for tracked products
   for (const item of items as { productId: string; quantity: number }[]) {

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { neon, neonConfig } from '@neondatabase/serverless';
 import { products as seedProducts } from './data';
-import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus, SlideshowBanner } from '@/types';
+import type { Product, Expense, BizDocument, DocumentItem, Order, OrderItem, OrderStatus, PaymentMethod, AdminUser, UserRole, DeliveryRun, DeliveryRunStatus, SlideshowBanner, PromoCode } from '@/types';
 
 // WSL2 fix: undici (Node's built-in fetch) tries IPv6 first but it's unroutable in WSL2,
 // causing ETIMEDOUT. Override with an https-module fetch that resolves to IPv4 directly.
@@ -123,12 +123,28 @@ export function toOrder(row: Record<string, unknown>): Order {
     items: row.items as OrderItem[],
     subtotal: Number(row.subtotal),
     deliveryFee: Number(row.delivery_fee),
+    discountCode: row.discount_code as string | undefined,
+    discountAmount: row.discount_amount != null ? Number(row.discount_amount) : undefined,
     total: Number(row.total),
     paymentMethod: row.payment_method as PaymentMethod,
     status: row.status as OrderStatus,
     deliveryDate: row.delivery_date ? toISODate(row.delivery_date) : undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+  };
+}
+
+export function toPromoCode(row: Record<string, unknown>): PromoCode {
+  return {
+    id: row.id as string,
+    code: row.code as string,
+    discountType: row.discount_type as 'percent' | 'fixed',
+    discountValue: Number(row.discount_value),
+    minOrder: Number(row.min_order),
+    maxUses: row.max_uses != null ? Number(row.max_uses) : null,
+    usesCount: Number(row.uses_count),
+    active: Boolean(row.active),
+    createdAt: row.created_at as string,
   };
 }
 
@@ -319,6 +335,23 @@ export async function ensureSchema(): Promise<void> {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS promo_codes (
+      id             TEXT        PRIMARY KEY,
+      code           TEXT        UNIQUE NOT NULL,
+      discount_type  TEXT        NOT NULL DEFAULT 'percent',
+      discount_value NUMERIC     NOT NULL,
+      min_order      NUMERIC     NOT NULL DEFAULT 0,
+      max_uses       INTEGER,
+      uses_count     INTEGER     NOT NULL DEFAULT 0,
+      active         BOOLEAN     NOT NULL DEFAULT true,
+      created_at     TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_code TEXT`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0`;
 
   ready = true;
 }

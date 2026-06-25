@@ -105,12 +105,26 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   deliveryFee: number;
+  discountCode?: string;
+  discountAmount?: number;
   total: number;
   paymentMethod: PaymentMethod;
   status: OrderStatus;
   deliveryDate?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface PromoCode {
+  id: string;
+  code: string;
+  discountType: 'percent' | 'fixed';
+  discountValue: number;
+  minOrder: number;
+  maxUses: number | null;
+  usesCount: number;
+  active: boolean;
+  createdAt: string;
 }
 
 export type DeliveryRunStatus = 'planned' | 'in_progress' | 'completed';

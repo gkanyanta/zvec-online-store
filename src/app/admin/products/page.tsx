@@ -37,12 +37,20 @@ export default function AdminProductsPage() {
           <h1 className="text-2xl font-black text-gray-900">Products</h1>
           <p className="text-gray-500 text-sm">{inStockCount} in stock · {outCount} out of stock</p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors"
-        >
-          <Plus size={16} /> Add Product
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/products/stock"
+            className="flex items-center gap-2 border border-gray-200 hover:border-teal-400 text-gray-600 hover:text-teal-700 font-semibold px-4 py-2 rounded-xl text-sm transition-colors bg-white"
+          >
+            Edit Stock
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors"
+          >
+            <Plus size={16} /> Add Product
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

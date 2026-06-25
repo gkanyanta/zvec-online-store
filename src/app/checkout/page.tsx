@@ -4,12 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ShoppingCart, Check, Truck, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Check, Truck, AlertCircle, Tag, X } from 'lucide-react';
 import { useCartStore } from '@/store/cart';
 import { useOrdersStore } from '@/store/orders';
 import { formatPrice } from '@/lib/utils';
 import { zambianProvinces } from '@/lib/data';
-import { CustomerInfo } from '@/types';
+import { CustomerInfo, PromoCode } from '@/types';
 
 function getTomorrow() {
   const d = new Date();
@@ -24,6 +24,10 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'mobile_money'>('cod');
   const [deliveryDate, setDeliveryDate] = useState('');
+  const [promoInput, setPromoInput] = useState('');
+  const [promoApplied, setPromoApplied] = useState<PromoCode | null>(null);
+  const [promoError, setPromoError] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const [form, setForm] = useState<CustomerInfo>({
     firstName: '',
@@ -40,7 +44,34 @@ export default function CheckoutPage() {
 
   const subtotal = total();
   const deliveryFee = 0;
-  const orderTotal = subtotal + deliveryFee;
+  const discountAmount = promoApplied
+    ? promoApplied.discountType === 'percent'
+      ? Math.round((subtotal * promoApplied.discountValue) / 100)
+      : Math.min(promoApplied.discountValue, subtotal)
+    : 0;
+  const orderTotal = Math.max(0, subtotal + deliveryFee - discountAmount);
+
+  async function applyPromo() {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+    setPromoLoading(true); setPromoError('');
+    try {
+      const res = await fetch(`/api/promo/${encodeURIComponent(code)}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? 'Invalid promo code');
+      }
+      const promo: PromoCode = await res.json();
+      if (subtotal < promo.minOrder) {
+        throw new Error(`Minimum order of ${formatPrice(promo.minOrder)} required for this code`);
+      }
+      setPromoApplied(promo);
+    } catch (e: unknown) {
+      setPromoError(e instanceof Error ? e.message : 'Invalid promo code');
+    } finally {
+      setPromoLoading(false);
+    }
+  }
 
   function update(field: keyof CustomerInfo, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -90,6 +121,8 @@ export default function CheckoutPage() {
         })),
         subtotal,
         deliveryFee,
+        discountCode: promoApplied?.code,
+        discountAmount: discountAmount || undefined,
         total: orderTotal,
         paymentMethod,
         status: 'pending' as const,
@@ -336,10 +369,51 @@ export default function CheckoutPage() {
                   <span>Delivery</span>
                   <span className="text-teal-600 font-semibold">FREE</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600 font-semibold">
+                    <span>Promo ({promoApplied?.code})</span>
+                    <span>−{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-black text-lg text-gray-900 pt-2 border-t border-gray-100">
                   <span>Total</span>
                   <span className="text-teal-700">{formatPrice(orderTotal)}</span>
                 </div>
+              </div>
+
+              {/* Promo code */}
+              <div className="mt-4">
+                {promoApplied ? (
+                  <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
+                    <Tag size={14} className="text-green-600 shrink-0" />
+                    <span className="text-green-700 text-xs font-semibold flex-1">{promoApplied.code} applied — saving {formatPrice(discountAmount)}</span>
+                    <button onClick={() => { setPromoApplied(null); setPromoInput(''); }} className="text-green-500 hover:text-green-700">
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoInput}
+                        onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(''); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyPromo(); } }}
+                        placeholder="Promo code"
+                        className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-teal-400 font-mono uppercase placeholder:normal-case placeholder:font-sans"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyPromo}
+                        disabled={promoLoading || !promoInput.trim()}
+                        className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 disabled:bg-gray-200 text-white disabled:text-gray-400 font-bold px-3 py-2 rounded-xl text-xs transition-colors whitespace-nowrap"
+                      >
+                        <Tag size={13} /> {promoLoading ? '…' : 'Apply'}
+                      </button>
+                    </div>
+                    {promoError && <p className="text-red-500 text-xs mt-1">{promoError}</p>}
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 p-3 bg-teal-50 rounded-xl text-xs text-teal-700 flex items-start gap-2">

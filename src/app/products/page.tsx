@@ -20,6 +20,7 @@ function ProductsContent() {
   const [searchQuery, setSearchQuery] = useState(qParam);
   const [sortBy, setSortBy] = useState('default');
   const [maxPrice, setMaxPrice] = useState(20000);
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   // Sync search when navigating from the header search overlay
@@ -41,12 +42,14 @@ function ProductsContent() {
 
     result = result.filter((p) => p.price <= maxPrice);
 
+    if (inStockOnly) result = result.filter((p) => p.inStock);
+
     if (sortBy === 'price-asc') result.sort((a, b) => a.price - b.price);
     else if (sortBy === 'price-desc') result.sort((a, b) => b.price - a.price);
     else if (sortBy === 'name') result.sort((a, b) => a.name.localeCompare(b.name));
 
     return result;
-  }, [selectedCategory, searchQuery, maxPrice, sortBy]);
+  }, [selectedCategory, searchQuery, maxPrice, inStockOnly, sortBy]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -133,6 +136,17 @@ function ProductsContent() {
               <span className="font-semibold text-teal-700">K{maxPrice.toLocaleString()}</span>
             </div>
           </div>
+
+          {/* In stock only */}
+          <label className="flex items-center gap-3 bg-white rounded-xl border border-gray-100 p-4 cursor-pointer hover:border-teal-200 transition-colors">
+            <input
+              type="checkbox"
+              checked={inStockOnly}
+              onChange={(e) => setInStockOnly(e.target.checked)}
+              className="w-4 h-4 accent-teal-500 shrink-0"
+            />
+            <span className="text-sm font-medium text-gray-700">In stock only</span>
+          </label>
         </aside>
 
         {/* Mobile filter dropdown */}
@@ -178,7 +192,7 @@ function ProductsContent() {
               <h3 className="text-xl font-semibold text-gray-700 mb-2">No products found</h3>
               <p className="text-gray-500 mb-4">Try adjusting your filters or search query.</p>
               <button
-                onClick={() => { setSelectedCategory('all'); setSearchQuery(''); setMaxPrice(20000); }}
+                onClick={() => { setSelectedCategory('all'); setSearchQuery(''); setMaxPrice(20000); setInStockOnly(false); }}
                 className="text-teal-600 hover:text-teal-700 font-medium"
               >
                 Clear all filters
