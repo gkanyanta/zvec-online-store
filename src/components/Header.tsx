@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Search, Menu, X, Phone, ChevronRight, Heart } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, Phone, ChevronRight, Heart, User } from 'lucide-react';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cart';
 import { useInventoryStore } from '@/store/inventory';
 import { useWishlistStore } from '@/store/wishlist';
+import { useCustomerStore } from '@/store/customer';
 import { formatPrice } from '@/lib/utils';
 import { ZVEC_PHONE_DISPLAY, ZVEC_WHATSAPP_URL } from '@/lib/data';
 
@@ -18,6 +19,7 @@ export default function Header() {
   const { itemCount, openCart } = useCartStore();
   const count = itemCount();
   const wishlistCount = useWishlistStore((s) => s.items.length);
+  const customer = useCustomerStore((s) => s.customer);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -124,6 +126,15 @@ export default function Header() {
               >
                 <Search size={18} />
               </button>
+
+              <Link
+                href={customer ? '/account' : '/account/login'}
+                aria-label={customer ? 'My Account' : 'Sign in'}
+                className="flex items-center justify-center w-9 h-9 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                title={customer ? `${customer.firstName} ${customer.lastName}` : 'Sign in'}
+              >
+                <User size={18} />
+              </Link>
 
               <Link
                 href="/wishlist"

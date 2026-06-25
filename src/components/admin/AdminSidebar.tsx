@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, ShoppingBag, Package, Users, Truck,
   LogOut, ExternalLink, ChevronRight, X, Gift,
-  ReceiptText, TrendingUp, Wallet, UserCog, GalleryHorizontal, Tag, Star, BarChart2, Bell,
+  ReceiptText, TrendingUp, Wallet, UserCog, GalleryHorizontal, Tag, Star, BarChart2, Bell, Zap,
 } from 'lucide-react';
 import { useAuthStore, type UserRole } from '@/store/auth';
 import { useOrdersStore } from '@/store/orders';
@@ -20,6 +20,7 @@ const NAV = [
   { href: '/admin/reviews',    label: 'Reviews',   icon: Star,              exact: false, roles: ['owner', 'sales'] as UserRole[] },
   { href: '/admin/analytics',  label: 'Analytics', icon: BarChart2,         exact: false, roles: ['owner'] as UserRole[] },
   { href: '/admin/restock-requests', label: 'Restock', icon: Bell,           exact: false, roles: ['owner', 'sales'] as UserRole[] },
+  { href: '/admin/flash-sales',      label: 'Flash Sales', icon: Zap,        exact: false, roles: ['owner', 'sales'] as UserRole[] },
   { href: '/admin/products',   label: 'Products',  icon: Package,         exact: false, roles: ['owner', 'sales'] as UserRole[] },
   { href: '/admin/packages',   label: 'Packages',  icon: Gift,            exact: false, roles: ['owner', 'sales'] as UserRole[] },
   { href: '/admin/documents',  label: 'Documents', icon: ReceiptText,     exact: false, roles: ['owner', 'sales'] as UserRole[] },

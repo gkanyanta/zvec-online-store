@@ -389,6 +389,30 @@ export async function ensureSchema(): Promise<void> {
     )
   `;
 
+  await sql`
+    CREATE TABLE IF NOT EXISTS flash_sales (
+      id         TEXT        PRIMARY KEY,
+      product_id TEXT        NOT NULL,
+      label      TEXT        NOT NULL DEFAULT 'Flash Sale',
+      sale_price NUMERIC     NOT NULL,
+      ends_at    TIMESTAMPTZ NOT NULL,
+      active     BOOLEAN     NOT NULL DEFAULT true,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS customers (
+      id         TEXT        PRIMARY KEY,
+      first_name TEXT        NOT NULL,
+      last_name  TEXT        NOT NULL,
+      email      TEXT        NOT NULL UNIQUE,
+      phone      TEXT        NOT NULL DEFAULT '',
+      password   TEXT        NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
   ready = true;
 }
 

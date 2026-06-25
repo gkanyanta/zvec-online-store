@@ -4,7 +4,7 @@ import { use, useState } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Phone, MapPin, Package, Clock, Check, ReceiptText, Truck } from 'lucide-react';
+import { ArrowLeft, Phone, MapPin, Package, Clock, Check, ReceiptText, Truck, Printer } from 'lucide-react';
 import { useOrdersStore, OrderStatus } from '@/store/orders';
 import { useAuthStore } from '@/store/auth';
 import { adminFetch } from '@/lib/adminFetch';
@@ -300,10 +300,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         <p className="text-xs text-gray-400 mt-2">Creates a new document pre-filled with this order&apos;s customer and items.</p>
       </div>}
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 items-center">
         <Link href="/admin/orders" className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm">
           <ArrowLeft size={14} /> Back to Orders
         </Link>
+        <a
+          href={`/admin/orders/${id}/print`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          <Printer size={14} /> Print Packing Slip
+        </a>
       </div>
     </div>
   );

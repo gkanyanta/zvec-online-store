@@ -8,6 +8,7 @@ import { packages, categories } from '@/lib/data';
 import { sql, toProduct, toBanner, ensureSchema } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
 import HeroSlideshow from '@/components/HeroSlideshow';
+import FlashSaleSection from '@/components/FlashSaleSection';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 
 const SLIDE_TAGLINES: Record<string, string> = {};
@@ -29,13 +30,30 @@ const packageAccentMap: Record<string, { ring: string; badge: string; dot: strin
 export default async function HomePage() {
   await ensureSchema();
 
-  const [featuredRows, moreRows, bannerRows] = await Promise.all([
+  const [featuredRows, moreRows, bannerRows, flashRows] = await Promise.all([
     sql`SELECT * FROM products WHERE badge IS NOT NULL ORDER BY name LIMIT 8`,
     sql`SELECT * FROM products ORDER BY id DESC LIMIT 8`,
     sql`SELECT * FROM slideshow_banners WHERE active = true ORDER BY sort_order ASC LIMIT 3`,
+    sql`
+      SELECT f.id, f.label, f.sale_price, f.ends_at,
+             p.id AS pid, p.name, p.slug, p.image, p.images, p.price, p.original_price,
+             p.description, p.category, p.in_stock, p.badge, p.features,
+             p.cost_price, p.stock_quantity, p.low_stock_threshold
+      FROM flash_sales f
+      JOIN products p ON p.id = f.product_id
+      WHERE f.active = true AND f.ends_at > NOW()
+      ORDER BY f.ends_at ASC LIMIT 3
+    `,
   ]);
   const featuredProducts = featuredRows.map(toProduct);
   const moreProducts    = moreRows.map(toProduct);
+  const flashSales = flashRows.map((r) => ({
+    id: r.id as string, label: r.label as string, salePrice: Number(r.sale_price), endsAt: r.ends_at as string,
+    product: toProduct({ id: r.pid, name: r.name, slug: r.slug, image: r.image, images: r.images,
+      price: r.price, original_price: r.original_price, description: r.description, category: r.category,
+      in_stock: r.in_stock, badge: r.badge, features: r.features, cost_price: r.cost_price,
+      stock_quantity: r.stock_quantity, low_stock_threshold: r.low_stock_threshold }),
+  }));
 
   // Use admin-managed banners if any exist, otherwise fall back to featured products
   const heroSlides = bannerRows.length > 0
@@ -82,6 +100,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Flash Sales ──────────────────────────────────────────── */}
+      <FlashSaleSection sales={flashSales} />
 
       {/* ── Shop by Category ─────────────────────────────────────── */}
       <section className="bg-white border-b border-gray-100">
